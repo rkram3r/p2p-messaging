@@ -1,20 +1,16 @@
-import Peer from 'peerjs';
+const P2P = require('socket.io-p2p');
+const io = require('socket.io-client');
 
-console.log(process.env.sender);
-const peer = new Peer(process.env.sender, { key: 'p2p-messaging', debug: 3 });
-
-peer.disconnect();
-const conn = peer.connect(process.env.reciever);
-
-conn.on('open', () => {
-  conn.send('hi!');
+const socket = io('localhost:3030');
+const options = { numClients: 10 };
+const p2p = new P2P(socket, options);
+console.log(p2p);
+p2p.on('peer-msg', (data) => {
+  console.log(data);
 });
-peer.on('connection', (connection) => {
-  console.log(connection);
-  connection.on('data', (data) => {
-    // Will print 'hi!'
-    console.log(data);
-  });
+const box = document.getElementById('msg-box');
+const form = document.getElementById('msg-form');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  p2p.emit('peer-msg', { text: box.value });
 });
-peer.on('call', (mediaConnection) => { console.log(mediaConnection); });
-console.log(peer);
