@@ -1,6 +1,7 @@
 import "babel-polyfill";
 import PeerAdapter from "./PeerAdapter";
 import "./index.scss";
+
 (() => {
   let p2p;
   const getElementById = id => document.getElementById(id);
@@ -19,7 +20,7 @@ import "./index.scss";
 
       const message = await p2p.listenOnMessage("peer-msg");
       const bubble = document.createElement("div");
-      bubble.className = "speech-bubble";
+      bubble.className = "speech-bubble-other";
       bubble.innerText = message;
       getElementById("messages").appendChild(bubble);
     }
@@ -30,6 +31,10 @@ import "./index.scss";
     if (isReady) {
       const { value } = getElementById("message");
       p2p.broadcast("peer-msg", value);
+      const bubble = document.createElement("div");
+      bubble.className = "speech-bubble-me";
+      bubble.innerText = value;
+      getElementById("messages").appendChild(bubble);
     }
   });
 })();
