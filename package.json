@@ -12,17 +12,17 @@
     "watch:server": "nodemon ./server 3030 --ignore 'src/*'"
   },
   "dependencies": {
-    "@types/socket.io-p2p": "^2.2.0",
-    "babel-polyfill": "^6.26.0",
-    "node-sass": "^4.9.4",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
     "socket.io-p2p": "^2.2.0",
     "socket.io-p2p-server": "^1.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.2",
+    "@types/socket.io-p2p": "^2.2.0",
     "concurrently": "^4.0.1",
+    "node-sass": "^4.9.4",
+    "@babel/core": "^7.1.2",
+    "babel-polyfill": "^6.26.0",
     "nodemon": "^1.18.4",
     "parcel": "^1.10.3"
   }

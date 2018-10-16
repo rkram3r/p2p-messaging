@@ -4,28 +4,30 @@ import "./index.scss";
 
 const getElementById = id => document.getElementById(id);
 
-const listenOnMessages = async p2pAdapter => {
-  const message = await p2pAdapter.listenOn("message");
-  const bubble = document.createElement("div");
-  bubble.className = "speech-bubble-other";
-  bubble.innerText = message;
-  getElementById("messages").appendChild(bubble);
+const listenOnMessages = p2pAdapter => {
+  p2pAdapter.listenOn("message", data => {
+    const bubble = document.createElement("div");
+    bubble.className = "speech-bubble-other";
+    bubble.innerText = data;
+    getElementById("messages").appendChild(bubble);
+  });
 };
 
-const listenOnNewPeers = async p2pAdapter => {
-  const newContact = await p2pAdapter.listenOn("contactList");
-  const li = document.createElement("li");
-  li.className = "list-group-item";
-  li.appendChild(document.createTextNode(newContact));
-  getElementById("peers").appendChild(li);
+const listenOnNewPeers = p2pAdapter => {
+  p2pAdapter.listenOn("contactList", data => {
+    const li = document.createElement("li");
+    li.className = "list-group-item";
+    li.appendChild(document.createTextNode(data));
+    getElementById("peers").appendChild(li);
+  });
 };
 
-const submitPeerId = async p2pAdapter => {
+const submitPeerId = p2pAdapter => {
   p2pAdapter.broadcast("contactList", p2pAdapter.peerId);
 };
 
-const sendMessage = async p2pAdapter => {
-  getElementById("send").addEventListener("click", async () => {
+const sendMessage = p2pAdapter => {
+  getElementById("send").addEventListener("click", () => {
     const { value } = getElementById("message");
     p2pAdapter.broadcast("message", value);
 

@@ -6,7 +6,7 @@ export default class PeerAdapter {
     const socket = io(address);
     this.p2p = new P2P(socket, options);
     this.p2p.on("upgrade", () => {
-      Promise.resolve(listeners.map(async f => await f(this)));
+      listeners.map(f => f(this));
     });
   }
 
@@ -16,12 +16,8 @@ export default class PeerAdapter {
     this.p2p._peers = { ...this.p2p._peers, ...otherPeer._peers };
   }
 
-  listenOn(channel) {
-    return new Promise(resolve => {
-      this.p2p.on(channel, data => {
-        resolve(data);
-      });
-    });
+  listenOn(channel, next) {
+    this.p2p.on(channel, next);
   }
 
   broadcast(channel, message) {
