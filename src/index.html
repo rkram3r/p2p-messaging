@@ -18,34 +18,32 @@
     <main role="main" class="container">
         <div class="my-3 p-3 bg-white rounded shadow-sm">
             <div class="form-group row">
-                <label for="connectToValue" class="col-sm-2 col-form-label">Connect to</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="connectToValue" placeholder="Address:Port" value="localhost:3030">
                 </div>
-                <div class="col-sm-2 float-right">
+                <div class="col-sm-4 float-right">
                     <button class="float-right btn btn-block btn-primary" id="connect">Connect</button>
                 </div>
             </div>
         </div>
-
         <div class="my-3 p-3 bg-white rounded shadow-sm">
-            <div class="container">
-                <div class="row">
-                    <div class="my-3 p-3 bg-white rounded shadow-sm col-sm-4">
-                        <h5>Peers</h5>
-                        <ul class="list-group" id="peers">
+            <div class="row">
+                <div class="my-3 p-3 bg-white rounded shadow-sm col-sm-4">
+                    <h5>Known peers</h5>
+                    <ul class="list-group" id="peers">
 
-                        </ul>
-                    </div>
-                    <div id="messages" class="my-3 p-3 bg-white rounded shadow-sm col-sm-8">
-                    </div>
+                    </ul>
+                </div>
+                <div id="messages" class="my-3 p-3 bg-white rounded shadow-sm col-sm-8">
                 </div>
             </div>
+        </div>
+        <div class="my-3 p-3 bg-white rounded shadow-sm">
             <div class="form-group row">
-                <div class="col-sm-10">
+                <div class="col-sm-8">
                     <input type="text" class="form-control" id="message" placeholder="Message">
                 </div>
-                <div class="col-sm-2 float-right">
+                <div class="col-sm-4 float-right">
                     <button id="send" class="float-right btn-block btn btn-primary">Send</button>
                 </div>
             </div>

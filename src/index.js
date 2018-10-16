@@ -3,6 +3,7 @@ import PeerAdapter from "./PeerAdapter";
 import "./index.scss";
 
 const getElementById = id => document.getElementById(id);
+const confirmationInMilliseconds = 3000;
 
 const listenOnMessages = p2pAdapter => {
   p2pAdapter.listenOn("message", data => {
@@ -14,16 +15,28 @@ const listenOnMessages = p2pAdapter => {
 };
 
 const listenOnNewPeers = p2pAdapter => {
+  const peers = new Map();
+  const refreshRate = 2000;
   p2pAdapter.listenOn("contactList", data => {
-    const li = document.createElement("li");
-    li.className = "list-group-item";
-    li.appendChild(document.createTextNode(data));
-    getElementById("peers").appendChild(li);
+    peers.set(data, new Date());
+    setInterval(() => {
+      getElementById("peers").innerHTML = "";
+      Array.from(peers).forEach(([key, value]) => {
+        if (value > new Date().setMilliseconds(-confirmationInMilliseconds)) {
+          const li = document.createElement("li");
+          li.className = "list-group-item";
+          li.appendChild(document.createTextNode(key));
+          getElementById("peers").appendChild(li);
+        }
+      });
+    }, refreshRate);
   });
 };
 
 const submitPeerId = p2pAdapter => {
-  p2pAdapter.broadcast("contactList", p2pAdapter.peerId);
+  setInterval(() => {
+    p2pAdapter.broadcast("contactList", p2pAdapter.peerId);
+  }, confirmationInMilliseconds);
 };
 
 const sendMessage = p2pAdapter => {
