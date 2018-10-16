@@ -2,7 +2,6 @@ import "babel-polyfill";
 import PeerAdapter from "./PeerAdapter";
 import "./index.scss";
 
-let p2p;
 const getElementById = id => document.getElementById(id);
 
 const listenOnMessages = async p2pAdapter => {
@@ -25,21 +24,24 @@ const submitPeerId = async p2pAdapter => {
   p2pAdapter.broadcast("contactList", p2pAdapter.peerId);
 };
 
+const sendMessage = async p2pAdapter => {
+  getElementById("send").addEventListener("click", async () => {
+    const { value } = getElementById("message");
+    p2pAdapter.broadcast("message", value);
+
+    const bubble = document.createElement("div");
+    bubble.className = "speech-bubble-me";
+    bubble.innerText = value;
+    getElementById("messages").appendChild(bubble);
+  });
+};
+
 getElementById("connect").addEventListener("click", async () => {
   const { value } = getElementById("connectToValue");
-  p2p = new PeerAdapter(value, [
+  new PeerAdapter(value, [
     listenOnMessages,
     listenOnNewPeers,
-    submitPeerId
+    submitPeerId,
+    sendMessage
   ]);
-});
-
-getElementById("send").addEventListener("click", async () => {
-  const { value } = getElementById("message");
-  p2p.broadcast("message", value);
-
-  const bubble = document.createElement("div");
-  bubble.className = "speech-bubble-me";
-  bubble.innerText = value;
-  getElementById("messages").appendChild(bubble);
 });

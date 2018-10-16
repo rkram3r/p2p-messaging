@@ -25,7 +25,6 @@ export default class PeerAdapter {
   }
 
   broadcast(channel, message) {
-    console.log(channel);
     this.p2p.emit(channel, message);
   }
 
