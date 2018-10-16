@@ -9,9 +9,10 @@
   "scripts": {
     "start": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
     "watch:client": "parcel ./src/index.html --open",
-    "watch:server": "nodemon ./server 3030"
+    "watch:server": "nodemon ./server 3030 --ignore 'src/*'"
   },
   "dependencies": {
+    "@types/socket.io-p2p": "^2.2.0",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
     "socket.io-p2p": "^2.2.0",
@@ -21,10 +22,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "concurrently": "^4.0.1",
-    "eslint": "^5.6.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
     "nodemon": "^1.18.4",
-    "parcel": "^1.10.2"
+    "parcel": "^1.10.3"
   }
 }
