@@ -37,6 +37,12 @@ const sendMessage = p2pAdapter => {
     getElementById("messages").appendChild(bubble);
   });
 };
+const join = p2pAdapter => {
+  getElementById("connect").addEventListener("click", () => {
+    const { value } = getElementById("connectToValue");
+    p2pAdapter.joinPeers(value);
+  });
+};
 
 getElementById("connect").addEventListener("click", async () => {
   const { value } = getElementById("connectToValue");
@@ -44,6 +50,7 @@ getElementById("connect").addEventListener("click", async () => {
     listenOnMessages,
     listenOnNewPeers,
     submitPeerId,
-    sendMessage
+    sendMessage,
+    join
   ]);
 });

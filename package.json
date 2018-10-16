@@ -7,9 +7,10 @@
   "author": "rkram3r <skill8r@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
+    "start": "concurrently \"npm run watch:server1\" \"npm run watch:server2\" \"npm run watch:client\"",
     "watch:client": "parcel ./src/index.html --open",
-    "watch:server": "nodemon ./server 3030 --ignore 'src/*'"
+    "watch:server1": "nodemon ./server 3030 ---watch server",
+    "watch:server2": "nodemon ./server 3031 --watch server"
   },
   "dependencies": {
     "socket.io": "^2.1.1",
