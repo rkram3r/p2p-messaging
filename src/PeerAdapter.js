@@ -2,12 +2,11 @@ import P2P from "socket.io-p2p";
 import io from "socket.io-client";
 
 export default class PeerAdapter {
-  constructor(address, options) {
+  constructor(address, listeners, options) {
     const socket = io(address);
     this.p2p = new P2P(socket, options);
-    this.ready = false;
-    this.p2p.on("connect", () => {
-      this.ready = true;
+    this.p2p.on("upgrade", () => {
+      Promise.resolve(listeners.map(async f => await f(this)));
     });
   }
 
@@ -17,15 +16,16 @@ export default class PeerAdapter {
     this.p2p._peers = { ...this.p2p._peers, ...otherPeer._peers };
   }
 
-  listenOnMessage(dataChannel) {
+  listenOn(channel) {
     return new Promise(resolve => {
-      this.p2p.on(dataChannel, data => {
+      this.p2p.on(channel, data => {
         resolve(data);
       });
     });
   }
 
   broadcast(channel, message) {
+    console.log(channel);
     this.p2p.emit(channel, message);
   }
 
@@ -35,18 +35,6 @@ export default class PeerAdapter {
 
   get peers() {
     return this.p2p._peers;
-  }
-
-  async isReady() {
-    return (
-      this.ready ||
-      new Promise(resolve => {
-        this.p2p.on("connect", () => {
-          this.ready = true;
-          resolve(true);
-        });
-      })
-    );
   }
 
   get peerId() {
