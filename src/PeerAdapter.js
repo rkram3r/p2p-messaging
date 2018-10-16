@@ -5,6 +5,10 @@ export default class PeerAdapter {
   constructor(address, options) {
     const socket = io(address);
     this.p2p = new P2P(socket, options);
+    this.ready = false;
+    this.p2p.on("connect", () => {
+      this.ready = true;
+    });
   }
 
   joinPeers(address, options) {
@@ -29,7 +33,23 @@ export default class PeerAdapter {
     this.p2p[peerId].signal(message);
   }
 
-  getKnownPeers() {
+  get peers() {
     return this.p2p._peers;
+  }
+
+  async isReady() {
+    return (
+      this.ready ||
+      new Promise(resolve => {
+        this.p2p.on("connect", () => {
+          this.ready = true;
+          resolve(true);
+        });
+      })
+    );
+  }
+
+  get peerId() {
+    return this.p2p.peerId;
   }
 }

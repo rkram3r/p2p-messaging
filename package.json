@@ -13,14 +13,15 @@
   },
   "dependencies": {
     "@types/socket.io-p2p": "^2.2.0",
+    "babel-polyfill": "^6.26.0",
+    "node-sass": "^4.9.4",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
     "socket.io-p2p": "^2.2.0",
     "socket.io-p2p-server": "^1.2.0"
   },
   "devDependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
+    "@babel/core": "^7.1.2",
     "concurrently": "^4.0.1",
     "nodemon": "^1.18.4",
     "parcel": "^1.10.3"

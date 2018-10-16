@@ -1,13 +1,35 @@
+import "babel-polyfill";
 import PeerAdapter from "./PeerAdapter";
+import "./index.scss";
+(() => {
+  let p2p;
+  const getElementById = id => document.getElementById(id);
 
-const p2p = new PeerAdapter("localhost:3030", { numClients: 10 });
-const box = document.getElementById("msg-box");
-const form = document.getElementById("msg-form");
-form.addEventListener("submit", e => {
-  e.preventDefault();
-  p2p.broadcast("peer-msg", { text: box.value });
-});
+  getElementById("connect").addEventListener("click", async () => {
+    const { value } = getElementById("connectToValue");
+    p2p = new PeerAdapter(value, { numClients: 10, channelName: "a" });
+    const isReady = await p2p.isReady();
+    if (isReady) {
+      Object.keys(p2p.peers).forEach(peerId => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.appendChild(document.createTextNode(peerId.slice(0, 10)));
+        getElementById("peers").appendChild(li);
+      });
 
-p2p.listenOnMessage("peer-msg").then(message => console.log(message));
+      const message = await p2p.listenOnMessage("peer-msg");
+      const bubble = document.createElement("div");
+      bubble.className = "speech-bubble";
+      bubble.innerText = message;
+      getElementById("messages").appendChild(bubble);
+    }
+  });
 
-console.log(p2p.getKnownPeers());
+  getElementById("send").addEventListener("click", async () => {
+    const isReady = await p2p.isReady();
+    if (isReady) {
+      const { value } = getElementById("message");
+      p2p.broadcast("peer-msg", value);
+    }
+  });
+})();
