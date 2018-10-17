@@ -5,6 +5,13 @@ import "./index.scss";
 const getElementById = id => document.getElementById(id);
 const confirmationInMilliseconds = 3000;
 
+const setDefaultHost = () => {
+  const host = location.search.includes('heroku') ? 'https://p2p-messaging.herokuapp.com' : 'localhost:3030';
+  getElementById('connectToValue').value = host;
+};
+
+setDefaultHost();
+
 const listenOnMessages = p2pAdapter => {
   p2pAdapter.listenOn("message", data => {
     const bubble = document.createElement("div");
