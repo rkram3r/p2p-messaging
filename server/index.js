@@ -4,3 +4,5 @@ const p2p = require("socket.io-p2p-server").Server;
 
 io.use(p2p);
 server.listen(process.env.PORT || 3030);
+
+console.log('server started on port: ', process.env.PORT || 3030);

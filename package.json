@@ -11,7 +11,7 @@
     "watch:client": "parcel ./src/index.html --open",
     "watch:server1": "cross-env PORT=3030 nodemon ./server ---watch server",
     "watch:server2": "cross-env PORT=3031 nodemon ./server --watch server",
-    "start:server": "node ./server/index.js"
+    "start:server": "node ./server/index.js --ssl --cors"
   },
   "dependencies": {
     "socket.io": "^2.1.1",
