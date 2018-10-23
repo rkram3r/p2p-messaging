@@ -16,8 +16,8 @@
     "babel-polyfill": "^6.26.0",
     "query-string": "^6.2.0",
     "socket.io": "^2.1.1",
+    "socket.io-p2p": "git@github.com:rkram3r/socket.io-p2p.git",
     "socket.io-client": "^2.1.1",
-    "socket.io-p2p": "^2.2.0",
     "socket.io-parser": "^3.2.0"
   },
   "devDependencies": {

@@ -46,7 +46,13 @@ const submitPeerId = (p2pAdapter) => {
 const sendMessage = (p2pAdapter) => {
   getElementById('send').addEventListener('click', () => {
     const { value } = getElementById('message');
-    p2pAdapter.broadcast('message', value);
+    const { sendTo } = queryString.parse(location.hash);
+    if (sendTo) {
+      console.log(p2pAdapter.peers, sendTo);
+      p2pAdapter.p2p.emitOne('message', value, sendTo);
+    } else {
+      p2pAdapter.broadcast('message', value);
+    }
 
     const bubble = document.createElement('div');
     bubble.className = 'speech-bubble-me';

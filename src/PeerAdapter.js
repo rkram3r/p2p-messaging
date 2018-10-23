@@ -13,7 +13,7 @@ export default class PeerAdapter {
   joinPeers(address, options) {
     const socket = io(address);
     const otherPeer = new P2P(socket, options);
-    this.p2p._peers = { ...this.p2p._peers, ...otherPeer._peers };
+    this.p2p.peers = { ...this.p2p.peers, ...otherPeer.peers };
   }
 
   listenOn(channel, next) {
@@ -29,7 +29,7 @@ export default class PeerAdapter {
   }
 
   get peers() {
-    return this.p2p._peers;
+    return this.p2p.peers;
   }
 
   get peerId() {
