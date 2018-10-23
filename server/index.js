@@ -1,11 +1,17 @@
-const server = require('http').createServer();
-const p2pserver = require('socket.io-p2p-server').Server;
-const io = require('socket.io')(server);
 
+const server = require('http').createServer();
+const io = require('socket.io')(server);
+const p2pSocket = require('./socket.io-p2p-server').Server;
+
+console.log(p2pSocket);
 const port = process.env.PORT || 3030;
 
-server.listen(port);
-io.use(p2pserver);
+server.listen(port, () => {
+  console.log('server started on port: ', port);
+});
+
+io.use(p2pSocket);
+
 
 io.on('connection', (socket) => {
   socket.on('peer-msg', (data) => {
@@ -17,4 +23,3 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('go-private', data);
   });
 });
-console.log('server started on port: ', port);
