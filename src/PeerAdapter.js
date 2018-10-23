@@ -1,11 +1,11 @@
-import P2P from "socket.io-p2p";
-import io from "socket.io-client";
+import P2P from 'socket.io-p2p';
+import io from 'socket.io-client';
 
 export default class PeerAdapter {
   constructor(address, listeners, options) {
     const socket = io(address);
     this.p2p = new P2P(socket, options);
-    this.p2p.on("upgrade", () => {
+    this.p2p.on('upgrade', () => {
       listeners.map(f => f(this));
     });
   }

@@ -1,9 +1,9 @@
 import 'babel-polyfill';
+import queryString from 'query-string';
 import PeerAdapter from './PeerAdapter';
 import './index.scss';
 
 const getElementById = id => document.getElementById(id);
-const confirmationInMilliseconds = 3000;
 
 const setDefaultHost = () => {
   const host = location.search.includes('heroku') ? 'https://p2p-messaging.herokuapp.com' : 'localhost:3030';
@@ -22,28 +22,25 @@ const listenOnMessages = (p2pAdapter) => {
 };
 
 const listenOnNewPeers = (p2pAdapter) => {
-  const peers = new Map();
-  const refreshRate = 2000;
-  p2pAdapter.listenOn('contactList', (data) => {
-    peers.set(data, new Date());
-    setInterval(() => {
-      getElementById('peers').innerHTML = '';
-      Array.from(peers).forEach(([key, value]) => {
-        if (value > new Date().setMilliseconds(-confirmationInMilliseconds)) {
-          const li = document.createElement('li');
-          li.className = 'list-group-item';
-          li.appendChild(document.createTextNode(key));
-          getElementById('peers').appendChild(li);
+  p2pAdapter.listenOn('contactList', () => {
+    const { peers } = p2pAdapter;
+    getElementById('peers').innerHTML = '';
+    Object.keys(p2pAdapter.peers)
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .forEach((key) => {
+        if (peers[key]._channelReady) {
+          const a = document.createElement('a');
+          a.classList = ['list-group-item-action', 'list-group-item'];
+          a.setAttribute('href', `#sendTo=${key}`);
+          a.appendChild(document.createTextNode(key));
+          getElementById('peers').appendChild(a);
         }
       });
-    }, refreshRate);
   });
 };
 
 const submitPeerId = (p2pAdapter) => {
-  setInterval(() => {
-    p2pAdapter.broadcast('contactList', p2pAdapter.peerId);
-  }, confirmationInMilliseconds);
+  p2pAdapter.broadcast('contactList', p2pAdapter.peerId);
 };
 
 const sendMessage = (p2pAdapter) => {
