@@ -3,13 +3,9 @@ const server = require('http').createServer();
 const io = require('socket.io')(server);
 const p2pSocket = require('./socket.io-p2p-server').Server;
 
-console.log(p2pSocket);
 const port = process.env.PORT || 3030;
 
-server.listen(port, () => {
-  console.log('server started on port: ', port);
-});
-
+server.listen(port, () => console.log('server started on port: ', port));
 io.use(p2pSocket);
 
 
