@@ -43,7 +43,7 @@ const sendMessage = (p2pAdapter) => {
     }
     const { sendTo } = queryString.parse(location.hash);
     if (sendTo) {
-      p2pAdapter.p2p.emitOne('message', { value, name: p2pAdapter.name }, sendTo);
+      p2pAdapter.sendTo('message', { value, name: p2pAdapter.name }, sendTo);
     } else {
       p2pAdapter.broadcast('message', { value, name: p2pAdapter.name });
     }
@@ -65,8 +65,8 @@ const join = (p2pAdapter) => {
 };
 
 
-const submitPeerId = (p2pAdapter, name) => {
-  const { peerId } = p2pAdapter;
+const submitPeerId = (p2pAdapter) => {
+  const { peerId, name } = p2pAdapter;
   p2pAdapter.broadcast('contactList', { peerId, name });
 };
 
@@ -77,7 +77,7 @@ getElementById('connect').addEventListener('click', async () => {
   const peerAdapter = new PeerAdapter(address, name, [
     listenOnMessages,
     listenOnNewPeers,
-    adapter => submitPeerId(adapter, name),
+    submitPeerId,
   ]);
 
   sendMessage(peerAdapter);

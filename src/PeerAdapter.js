@@ -25,6 +25,10 @@ export default class PeerAdapter {
     this.p2p.emit(channel, message);
   }
 
+  sendTo(channel, message, peerId) {
+    this.p2p.emitOne(channel, message, peerId);
+  }
+
   sendMessage(message, peerId) {
     this.p2p[peerId].signal(message);
   }
