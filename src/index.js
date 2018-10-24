@@ -39,16 +39,11 @@ const listenOnNewPeers = (p2pAdapter) => {
   });
 };
 
-const submitPeerId = (p2pAdapter) => {
-  p2pAdapter.broadcast('contactList', p2pAdapter.peerId);
-};
-
 const sendMessage = (p2pAdapter) => {
   getElementById('send').addEventListener('click', () => {
     const { value } = getElementById('message');
     const { sendTo } = queryString.parse(location.hash);
     if (sendTo) {
-      console.log(p2pAdapter.peers, sendTo);
       p2pAdapter.p2p.emitOne('message', value, sendTo);
     } else {
       p2pAdapter.broadcast('message', value);
@@ -60,6 +55,7 @@ const sendMessage = (p2pAdapter) => {
     getElementById('messages').appendChild(bubble);
   });
 };
+
 const join = (p2pAdapter) => {
   getElementById('connect').addEventListener('click', () => {
     const { value } = getElementById('connectToValue');
@@ -67,13 +63,20 @@ const join = (p2pAdapter) => {
   });
 };
 
+
+const submitPeerId = (p2pAdapter) => {
+  p2pAdapter.broadcast('contactList', p2pAdapter.peerId);
+};
+
+
 getElementById('connect').addEventListener('click', async () => {
   const { value } = getElementById('connectToValue');
-  new PeerAdapter(value, [
+  const peerAdapter = new PeerAdapter(value, [
     listenOnMessages,
     listenOnNewPeers,
     submitPeerId,
-    sendMessage,
-    join,
   ]);
+
+  sendMessage(peerAdapter);
+  join(peerAdapter);
 });

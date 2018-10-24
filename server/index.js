@@ -1,4 +1,3 @@
-
 const server = require('http').createServer();
 const io = require('socket.io')(server);
 const p2pSocket = require('./socket.io-p2p-server').Server;
