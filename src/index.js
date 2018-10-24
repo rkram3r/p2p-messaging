@@ -6,53 +6,54 @@ import './index.scss';
 const getElementById = id => document.getElementById(id);
 
 const setDefaultHost = () => {
-  const host = location.search.includes('heroku') ? 'https://p2p-messaging.herokuapp.com' : 'localhost:3030';
+  const host = location.search.includes('heroku') ? 'name@https://p2p-messaging.herokuapp.com' : 'name@localhost:3030';
   getElementById('connectToValue').value = host;
 };
 
 setDefaultHost();
 
 const listenOnMessages = (p2pAdapter) => {
-  p2pAdapter.listenOn('message', (data) => {
+  p2pAdapter.listenOn('message', (message) => {
+    const { name, value } = message;
     const bubble = document.createElement('div');
     bubble.className = 'speech-bubble-other';
-    bubble.innerText = data;
+    bubble.innerText = `${name}\n${value}`;
     getElementById('messages').appendChild(bubble);
   });
 };
 
 const listenOnNewPeers = (p2pAdapter) => {
-  p2pAdapter.listenOn('contactList', () => {
-    const { peers } = p2pAdapter;
-    getElementById('peers').innerHTML = '';
-    Object.keys(p2pAdapter.peers)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .forEach((key) => {
-        if (peers[key]._channelReady) {
-          const a = document.createElement('a');
-          a.classList = ['list-group-item-action', 'list-group-item'];
-          a.setAttribute('href', `#sendTo=${key}`);
-          a.appendChild(document.createTextNode(key));
-          getElementById('peers').appendChild(a);
-        }
-      });
+  p2pAdapter.listenOn('contactList', (newPeer) => {
+    const { peerId, name } = newPeer;
+    if (p2pAdapter.peers[peerId] && p2pAdapter.peers[peerId]._channelReady) {
+      const a = document.createElement('a');
+      a.classList = ['list-group-item-action', 'list-group-item'];
+      a.setAttribute('href', `#sendTo=${peerId}`);
+      a.appendChild(document.createTextNode(name));
+      getElementById('peers').appendChild(a);
+    }
   });
 };
 
 const sendMessage = (p2pAdapter) => {
   getElementById('send').addEventListener('click', () => {
     const { value } = getElementById('message');
+    if (value === '') {
+      return;
+    }
     const { sendTo } = queryString.parse(location.hash);
     if (sendTo) {
-      p2pAdapter.p2p.emitOne('message', value, sendTo);
+      p2pAdapter.p2p.emitOne('message', { value, name: p2pAdapter.name }, sendTo);
     } else {
-      p2pAdapter.broadcast('message', value);
+      p2pAdapter.broadcast('message', { value, name: p2pAdapter.name });
     }
+
 
     const bubble = document.createElement('div');
     bubble.className = 'speech-bubble-me';
-    bubble.innerText = value;
+    bubble.innerText = `${p2pAdapter.name}\n${value}`;
     getElementById('messages').appendChild(bubble);
+    getElementById('message').value = '';
   });
 };
 
@@ -64,17 +65,19 @@ const join = (p2pAdapter) => {
 };
 
 
-const submitPeerId = (p2pAdapter) => {
-  p2pAdapter.broadcast('contactList', p2pAdapter.peerId);
+const submitPeerId = (p2pAdapter, name) => {
+  const { peerId } = p2pAdapter;
+  p2pAdapter.broadcast('contactList', { peerId, name });
 };
 
 
 getElementById('connect').addEventListener('click', async () => {
   const { value } = getElementById('connectToValue');
-  const peerAdapter = new PeerAdapter(value, [
+  const [name, address] = value.split('@');
+  const peerAdapter = new PeerAdapter(address, name, [
     listenOnMessages,
     listenOnNewPeers,
-    submitPeerId,
+    adapter => submitPeerId(adapter, name),
   ]);
 
   sendMessage(peerAdapter);
