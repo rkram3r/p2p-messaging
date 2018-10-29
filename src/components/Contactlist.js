@@ -7,19 +7,19 @@ import Messages from './Messages';
 export default connect(
   state => ({ ...state.p2pReducer }),
   dispatch => bindActionCreators(Actions, dispatch),
-)(({ peers }) => (
+)(({ contactlist }) => (
   <div className="my-3 p-3 bg-white rounded shadow-sm">
     <div className="row">
       <div className="my-3 p-3 bg-white rounded shadow-sm col-sm-4">
         <h5>Contactlist</h5>
         <div className="list-group">
-          {peers.map(peer => (
+          {Array.from(contactlist).map(([id, { name }]) => (
             <a
-              key={peer.id}
+              key={id}
               className="list-group-item-action list-group-item"
-              href={`#sendTo${peer.name}`}
+              href={`#sendTo${name}`}
             >
-              {peer.name}
+              {name}
             </a>
           ))}
         </div>

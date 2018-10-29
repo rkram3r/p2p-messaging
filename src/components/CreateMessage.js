@@ -7,7 +7,7 @@ export default connect(
   state => ({ ...state.p2pReducer }),
   dispatch => bindActionCreators(Actions, dispatch),
 )(({
-  message, onMessageChange, sendMessage, peers,
+  message, onMessageChange, broadcast, contactlist,
 }) => (
   <div className="my-3 p-3 bg-white rounded shadow-sm">
     <div className="form-group row">
@@ -21,7 +21,7 @@ export default connect(
         />
       </div>
       <div className="col-sm-4 float-right">
-        <button type="submit" className="float-right btn-block btn btn-primary" onClick={() => sendMessage(peers, message)}>Send</button>
+        <button type="submit" className="float-right btn-block btn btn-primary" onClick={() => broadcast(contactlist, message)}>Send</button>
       </div>
     </div>
   </div>

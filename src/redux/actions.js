@@ -17,7 +17,7 @@ export const createConnection = (myName, address) => (dispatch) => {
       }
       dispatch({ type: 'NEW_PEER', name, peer });
     });
-    peer.on('data', message => dispatch({ type: 'RECIEVE_MESSAGE', message, name }));
+    peer.on('data', message => dispatch(JSON.parse(message)));
   });
 
   left.on('signal', data => socket.emit('p2p-connect', { data, name: myName }));
@@ -31,9 +31,14 @@ export const onMessageChange = message => (dispatch) => {
   dispatch({ type: 'MESSAGE_CHANGE', message });
 };
 
-export const sendMessage = (peers, message) => (dispatch) => {
-  peers.forEach(({ peer }) => peer.send(message));
+export const broadcast = (contactlist, message) => (dispatch) => {
+  contactlist.forEach(({ peer }) => peer.send(JSON.stringify({ type: 'MESSAGE', message })));
   dispatch({ type: 'SEND_MESSAGE', message });
+};
+
+export const broadcastContactlist = (peer, contactlist) => () => {
+  // create an offer over another peer
+  peer.send(JSON.stringify({ type: 'CONTACTLIST', contactlist }));
 };
 
 export const connectionChange = connection => (dispatch) => {
