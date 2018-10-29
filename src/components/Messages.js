@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import * as Actions from '../redux/actions';
 import './Message.scss';
 
-const messages = ({ recievedMessages, myName }) => (
+export default connect(
+  state => ({ ...state.p2pReducer, ...state.connectionReducer }),
+  dispatch => bindActionCreators(Actions, dispatch),
+)(({ recievedMessages, myName }) => (
   <div className="my-3 p-3 bg-white rounded shadow-sm col-sm-8">
     {recievedMessages.map(({
       myMessage, name, message, recieved,
@@ -15,9 +18,4 @@ const messages = ({ recievedMessages, myName }) => (
       </div>
     ))}
   </div>
-);
-
-export default connect(
-  state => ({ ...state.p2pReducer, ...state.connectionReducer }),
-  dispatch => bindActionCreators(Actions, dispatch),
-)(messages);
+));

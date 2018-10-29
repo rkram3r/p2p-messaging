@@ -12,7 +12,8 @@ export default (oldState = {
 
   if (type === 'RECIEVE_MESSAGE') {
     const { name, message } = rest;
-    const recievedMessages = [...oldState.recievedMessages, { name, message, recieved: new Date() }];
+    const recievedMessages = [...oldState.recievedMessages,
+      { name, message, recieved: new Date() }];
     return { ...oldState, recievedMessages };
   }
 
@@ -21,7 +22,8 @@ export default (oldState = {
   }
   if (type === 'SEND_MESSAGE') {
     const { message } = action;
-    const recievedMessages = [...oldState.recievedMessages, { myMessage: true, message, recieved: new Date() }];
+    const recievedMessages = [...oldState.recievedMessages,
+      { myMessage: true, message, recieved: new Date() }];
     return { ...oldState, recievedMessages, message: '' };
   }
 

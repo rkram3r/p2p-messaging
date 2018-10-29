@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import * as Actions from '../redux/actions';
 import Messages from './Messages';
 
-const contactlist = ({ peers }) => (
+export default connect(
+  state => ({ ...state.p2pReducer }),
+  dispatch => bindActionCreators(Actions, dispatch),
+)(({ peers }) => (
   <div className="my-3 p-3 bg-white rounded shadow-sm">
     <div className="row">
       <div className="my-3 p-3 bg-white rounded shadow-sm col-sm-4">
@@ -24,9 +27,4 @@ const contactlist = ({ peers }) => (
       <Messages />
     </div>
   </div>
-);
-
-export default connect(
-  state => ({ ...state.p2pReducer }),
-  dispatch => bindActionCreators(Actions, dispatch),
-)(contactlist);
+));

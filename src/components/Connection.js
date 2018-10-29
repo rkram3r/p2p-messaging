@@ -3,7 +3,10 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Actions from '../redux/actions';
 
-const conn = ({
+export default connect(
+  state => ({ ...state.connectionReducer }),
+  dispatch => bindActionCreators(Actions, dispatch),
+)(({
   connectionChange, myName, address, createConnection, connection,
 }) => (
   <div className="my-3 p-3 bg-white rounded shadow-sm">
@@ -27,9 +30,4 @@ Connect
       </div>
     </div>
   </div>
-);
-
-export default connect(
-  state => ({ ...state.connectionReducer }),
-  dispatch => bindActionCreators(Actions, dispatch),
-)(conn);
+));

@@ -4,7 +4,7 @@ import Connection from './Connection';
 import Contactlist from './Contactlist';
 import CreateMessage from './CreateMessage';
 
-const app = () => (
+export default () => (
   <section>
     <Header />
     <main role="main" className="container">
@@ -14,6 +14,3 @@ const app = () => (
     </main>
   </section>
 );
-
-
-export default app;

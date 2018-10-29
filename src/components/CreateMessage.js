@@ -3,7 +3,10 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Actions from '../redux/actions';
 
-const createMessage = ({
+export default connect(
+  state => ({ ...state.p2pReducer }),
+  dispatch => bindActionCreators(Actions, dispatch),
+)(({
   message, onMessageChange, sendMessage, peers,
 }) => (
   <div className="my-3 p-3 bg-white rounded shadow-sm">
@@ -22,9 +25,4 @@ const createMessage = ({
       </div>
     </div>
   </div>
-);
-
-export default connect(
-  state => ({ ...state.p2pReducer }),
-  dispatch => bindActionCreators(Actions, dispatch),
-)(createMessage);
+));
