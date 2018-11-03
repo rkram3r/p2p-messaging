@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 
 // Polyfill set
 import 'core-js/es6/set';
+import 'babel-polyfill';
 import 'bootstrap/dist/css/bootstrap.css';
 import App from './components/App';
 import store from './store';
