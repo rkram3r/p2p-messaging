@@ -1,14 +1,25 @@
 
 export default (oldState = {
-  contactlist: new Map(), message: '', recievedMessages: [],
+  contactlist: new Map(),
+  message: '',
+  recievedMessages: [],
+  connectingData: {},
 }, action) => {
   const { type, ...rest } = action;
-
   if (type === 'NEW_PEER') {
-    const { peer, name, id } = rest;
+    const { id, ...peer } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    contactlist.set(id, { peer, name });
+    contactlist.set(id, { ...peer });
     return { ...oldState, contactlist };
+  }
+  if (type === 'UPDATE_PEER') {
+    const { to, from, ...peer } = rest;
+    const key = peer.peer.initiator ? to : from;
+    console.log(rest);
+    const contactlist = new Map([...oldState.contactlist]);
+    const oldPeer = contactlist.get(key);
+    contactlist.set(key, { ...oldPeer, ...peer });
+    return { ...oldState, contactlist, connectingData: {} };
   }
 
   if (type === 'MESSAGE') {
@@ -20,6 +31,12 @@ export default (oldState = {
 
   if (type === 'PUBLIC_KEY') {
     return { ...oldState, ...rest };
+  }
+
+  if (type === 'PING') {
+    const { name, id, ...connectingData } = rest;
+    console.log('PING', rest);
+    return { ...oldState, connectingData };
   }
 
   if (type === 'MESSAGE_CHANGE') {
