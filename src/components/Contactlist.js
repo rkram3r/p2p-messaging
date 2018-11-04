@@ -1,8 +1,12 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import WifiOff from 'react-feather/dist/icons/wifi-off';
+import WifiOn from 'react-feather/dist/icons/wifi';
+
 import * as Actions from '../redux/actions';
 import Messages from './Messages';
+import './Contactlist.scss';
 
 class Contactlist extends React.Component {
   componentDidUpdate(prevProps) {
@@ -22,14 +26,14 @@ class Contactlist extends React.Component {
             <h5>Contactlist</h5>
             <div className="list-group">
               {Array.from(contactlist).map(([id, { name, peer }]) => (
-                <a
+                <button
                   key={id}
+                  type="button"
                   className="list-group-item-action list-group-item"
-                  href={`#sendTo${name}`}
                 >
+                  {peer ? <WifiOn className="glyphicon" /> : <WifiOff className="glyphicon" />}
                   {name}
-                  {peer && 'can send..'}
-                </a>
+                </button>
               ))}
             </div>
           </div>

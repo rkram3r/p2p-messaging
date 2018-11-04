@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Actions from '../redux/actions';
-import './Message.scss';
+import './Messages.scss';
 
 export default connect(
   state => ({ ...state.p2pReducer, ...state.connectionReducer }),
