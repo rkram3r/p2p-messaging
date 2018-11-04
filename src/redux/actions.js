@@ -28,6 +28,7 @@ const createId = () => new Array(32)
 export const createConnection = (name, address) => async (dispatch) => {
   const socket = io(address, { transports: ['websocket'], secure: true });
   const id = createId();
+  dispatch({ type: 'PUBLIC_KEY', id, name });
   const left = new Peer({ initiator: true, trickle: false });
   const right = new Peer({ trickle: false });
 
@@ -42,8 +43,22 @@ export const onMessageChange = message => (dispatch) => {
 };
 
 export const broadcast = (contactlist, message) => (dispatch) => {
-  contactlist.forEach(({ peer }) => peer.send(JSON.stringify({ type: 'MESSAGE', message })));
+  contactlist.forEach(({ peer }) => peer && peer.send(JSON.stringify({ type: 'MESSAGE', message })));
   dispatch({ type: 'SEND_MESSAGE', message });
+};
+
+export const broadcastContactlist = contactlist => () => {
+  const contactlistWithoutPeers = Array
+    .from(contactlist)
+    .map(([key, { peer, ...rest }]) => [key, { ...rest }]);
+
+  Array.from(contactlist).forEach(([key, { peer }]) => {
+    const filteredList = contactlistWithoutPeers.filter(([id]) => id !== key);
+    const message = JSON.stringify({ type: 'CONTACTLIST', contactlist: filteredList });
+    if (peer) {
+      peer.send(message);
+    }
+  });
 };
 
 export const connectionChange = connection => (dispatch) => {

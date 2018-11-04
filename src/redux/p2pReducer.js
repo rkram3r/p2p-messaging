@@ -18,9 +18,19 @@ export default (oldState = {
     return { ...oldState, recievedMessages };
   }
 
+  if (type === 'PUBLIC_KEY') {
+    return { ...oldState, ...rest };
+  }
+
   if (type === 'MESSAGE_CHANGE') {
     return { ...oldState, ...rest };
   }
+
+  if (type === 'CONTACTLIST') {
+    const { contactlist } = rest;
+    return { ...oldState, contactlist: new Map([...contactlist, ...oldState.contactlist]) };
+  }
+
   if (type === 'SEND_MESSAGE') {
     const { message } = action;
     const recievedMessages = [...oldState.recievedMessages,
