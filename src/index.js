@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import 'core-js/es6/set';
 import 'babel-polyfill';
 import 'bootstrap/dist/css/bootstrap.css';
-import App from './components/App';
+import Router from './Router';
 import store from './store';
 
 const history = typeof window !== 'undefined'
@@ -16,7 +16,7 @@ const history = typeof window !== 'undefined'
 
 ReactDOM.render(
   <Provider store={store}>
-    <App history={history} />
+    <Router history={history} />
   </Provider>,
   document.getElementById('root'),
 );
