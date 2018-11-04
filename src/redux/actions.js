@@ -43,7 +43,6 @@ export const onMessageChange = message => (dispatch) => {
 };
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
-  console.log(sendTo);
   if (sendTo) {
     const { peer } = contactlist.get(sendTo);
     if (peer) {
