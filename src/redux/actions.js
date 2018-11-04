@@ -43,14 +43,9 @@ export const onMessageChange = message => (dispatch) => {
 };
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
-  if (sendTo) {
-    const { peer } = contactlist.get(sendTo);
-    if (peer) {
-      peer.send(JSON.stringify({ type: 'MESSAGE', message }));
-    }
-  } else {
-    contactlist.forEach(({ peer }) => peer && peer.send(JSON.stringify({ type: 'MESSAGE', message })));
-  }
+  const reciever = contactlist.get(sendTo) ? [contactlist.get(sendTo)] : contactlist;
+
+  reciever.forEach(({ peer }) => peer && peer.send(JSON.stringify({ type: 'MESSAGE', message })));
   dispatch({ type: 'SEND_MESSAGE', message });
 };
 
