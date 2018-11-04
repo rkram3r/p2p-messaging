@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-
+import { withRouter } from 'react-router';
 import WifiOff from 'react-feather/dist/icons/wifi-off';
 import WifiOn from 'react-feather/dist/icons/wifi';
 
@@ -20,7 +20,7 @@ class Contactlist extends React.Component {
   }
 
   render() {
-    const { contactlist } = this.props;
+    const { contactlist, match: { params: { sendTo } } } = this.props;
     return (
       <div className="my-3 p-3 bg-white rounded shadow-sm">
         <div className="row">
@@ -33,7 +33,7 @@ class Contactlist extends React.Component {
                     <Link
                       key={id}
                       to={id}
-                      className="list-group-item-action list-group-item"
+                      className={`list-group-item-action list-group-item ${sendTo === id && 'active'}`}
                     >
                       <WifiOn className="glyphicon" />
                       {name}
@@ -59,7 +59,7 @@ class Contactlist extends React.Component {
     );
   }
 }
-export default connect(
+export default withRouter(connect(
   state => ({ ...state.p2pReducer }),
   dispatch => bindActionCreators(Actions, dispatch),
-)(Contactlist);
+)(Contactlist));
