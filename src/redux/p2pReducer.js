@@ -13,6 +13,7 @@ export default (oldState = {
 
   if (type === 'MESSAGE') {
     const { name, message } = rest;
+    console.log(rest);
     const recievedMessages = [...oldState.recievedMessages,
       { name, message, recieved: new Date() }];
     return { ...oldState, recievedMessages };

@@ -17,7 +17,7 @@ const onSocketConnect = (value, left, right, socket, dispatch) => {
   peer.on('connect', () => onConnect({ ...key, peer, type }, socket, dispatch));
   peer.signal(data);
 
-  peer.on('data', message => dispatch(JSON.parse(message)));
+  peer.on('data', message => dispatch({ ...JSON.parse(message), ...key }));
 };
 
 const createId = () => new Array(32)
@@ -43,6 +43,7 @@ export const onMessageChange = message => (dispatch) => {
 };
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
+  console.log(sendTo);
   if (sendTo) {
     const { peer } = contactlist.get(sendTo);
     if (peer) {
