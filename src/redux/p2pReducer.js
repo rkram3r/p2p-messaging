@@ -5,15 +5,9 @@ export default (oldState = {
   const { type, ...rest } = action;
 
   if (type === 'NEW_PEER') {
-    const { peer, name } = rest;
+    const { peer, name, id } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    contactlist.set(peer._id, { peer, name });
-    return { ...oldState, contactlist };
-  }
-
-  if (type === 'CONTACTLIST') {
-    console.log(rest);
-    const contactlist = new Map([...oldState.contactlist, ...rest.contactlist]);
+    contactlist.set(id, { peer, name });
     return { ...oldState, contactlist };
   }
 
