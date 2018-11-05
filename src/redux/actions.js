@@ -22,9 +22,7 @@ const onSocketConnect = (value, left, right, socket, dispatch) => {
   peer.on('data', message => dispatch({ ...JSON.parse(message), ...key }));
 };
 
-const createId = () => new Array(32)
-  .fill()
-  .map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(62 * Math.random()))).join('');
+const createId = () => Math.floor(1000000000 * Math.random());
 
 
 export const createConnection = (name, address) => async (dispatch) => {
@@ -119,8 +117,8 @@ export const onMessageChange = message => (dispatch) => {
 };
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
-  const reciever = contactlist.get(sendTo) ? [contactlist.get(sendTo)] : contactlist;
-
+  const reciever = contactlist.get(+sendTo) ? [contactlist.get(+sendTo)] : contactlist;
+  console.log(reciever, +sendTo);
   reciever.forEach(({ peer, state }) => state === 'READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message })));
   dispatch({ type: 'SEND_MESSAGE', message });
 };

@@ -1,14 +1,15 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
-import WifiOff from 'react-feather/dist/icons/wifi-off';
-import WifiOn from 'react-feather/dist/icons/wifi';
-import AskToConnect from 'react-feather/dist/icons/help-circle';
 
-import * as Actions from '../redux/actions';
-import Messages from './Messages';
+
+import * as Actions from '../../redux/actions';
+import Messages from '../Messages';
+import Ready from './Ready';
+import Connecting from './Connecting';
+import AskToConnect from './AskToConnect';
+import Ping from './Ping';
 import './Contactlist.scss';
 
 class Contactlist extends React.Component {
@@ -40,9 +41,8 @@ class Contactlist extends React.Component {
 
   render() {
     const {
-      contactlist, match: { params: { sendTo } }, id, ping,
+      contactlist, match: { params: { sendTo } }, id,
       connectingData,
-      createPeerConnection,
     } = this.props;
     return (
       <div className="my-3 p-3 bg-white rounded shadow-sm">
@@ -51,59 +51,16 @@ class Contactlist extends React.Component {
             <h5>Contactlist</h5>
             <div className="list-group">
               {Array.from(contactlist).map(([to, { name, state }]) => {
-                console.log(to, name, state);
                 if (state === 'READY') {
-                  return (
-                    <Link
-                      key={to}
-                      to={to}
-                      className={`list-group-item-action list-group-item ${sendTo === to && 'active'}`}
-                    >
-                      <WifiOn className="glyphicon" />
-                      {name}
-                    </Link>
-                  );
+                  return <Ready key={to} {...{ sendTo, to, name }} />;
                 }
-                const message = { from: id, to, lastPeer: id };
-
                 if (state === 'CONNECTING') {
-                  return (
-                    <div
-                      key={to}
-                      className="list-group-item-action list-group-item"
-                    >
-                      ...
-                      {' '}
-                      {name}
-                    </div>
-                  );
+                  return <Connecting key={to} name={name} />;
                 }
                 if (id === connectingData.to && to === connectingData.from) {
-                  return (
-                    <button
-                      key={to}
-                      onClick={() => createPeerConnection(contactlist, connectingData, id)}
-                      type="button"
-                      className="list-group-item-action list-group-item"
-                    >
-                      <AskToConnect className="glyphicon" />
-                      {name}
-                    </button>
-                  );
+                  return <AskToConnect key={to} name={name} />;
                 }
-
-
-                return (
-                  <button
-                    key={to}
-                    onClick={() => ping(contactlist, message, id)}
-                    type="button"
-                    className="list-group-item-action list-group-item"
-                  >
-                    <WifiOff className="glyphicon" />
-                    {name}
-                  </button>
-                );
+                return <Ping key={to} peer={{ to, name }} />;
               })}
             </div>
           </div>

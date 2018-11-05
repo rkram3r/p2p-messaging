@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Connection from './Connection';
-import Contactlist from './Contactlist';
+import Contactlist from './Contactlist/index';
 import CreateMessage from './CreateMessage';
 
 export default () => (
