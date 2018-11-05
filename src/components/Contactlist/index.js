@@ -10,7 +10,6 @@ import Ready from './Ready';
 import Connecting from './Connecting';
 import AskToConnect from './AskToConnect';
 import Ping from './Ping';
-import './Contactlist.scss';
 
 class Contactlist extends React.Component {
   componentDidUpdate(prevProps) {

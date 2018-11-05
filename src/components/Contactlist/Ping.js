@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import WifiOff from 'react-feather/dist/icons/wifi-off';
+import NotConnected from 'react-feather/dist/icons/phone-off';
 import * as Actions from '../../redux/actions';
 
 export default connect(
@@ -19,7 +19,7 @@ export default connect(
       type="button"
       className="list-group-item-action list-group-item"
     >
-      <WifiOff className="glyphicon" />
+      <NotConnected className="float-right" />
       {console.log(name, id)}
       {name}
     </button>
