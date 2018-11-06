@@ -27,13 +27,11 @@ class Contactlist extends React.Component {
     }
     const peerTo = contactlist.get(connectingData.to) || false;
     const peerFrom = contactlist.get(connectingData.from) || false;
-    console.log(connectingData, id, peerFrom);
+
     if (peerFrom && peerFrom.state === 'CONNECTING' && connectingData.to && id === connectingData.to) {
-      console.log('finalizeConnection', peerFrom, peerTo);
       finalizeConnection(contactlist, connectingData);
     } else
     if (peerTo && peerTo.state !== 'CONNECTING' && connectingData.to && id !== connectingData.to) {
-      console.log('forwardPing', connectingData, peerFrom, peerTo);
       forwardPing(contactlist, connectingData);
     }
   }

@@ -20,7 +20,6 @@ export default connect(
       className="list-group-item-action list-group-item"
     >
       <NotConnected className="float-right" />
-      {console.log(name, id)}
       {name}
     </button>
   );

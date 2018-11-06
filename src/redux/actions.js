@@ -28,7 +28,6 @@ const createId = () => Math.floor(1000000000 * Math.random());
 export const createConnection = (name, address) => async (dispatch) => {
   const socket = io(address, { transports: ['websocket'], secure: true });
   const id = createId();
-  console.log(id);
   dispatch({ type: 'PUBLIC_KEY', id, name });
   const left = new Peer({ initiator: true, trickle: false });
   const right = new Peer({ trickle: false });
@@ -71,7 +70,6 @@ export const finalizeConnection = (contactlist, message) => (dispatch) => {
   const { peer, name } = contactlist.get(from);
   peer.on('data', msg => dispatch({ ...JSON.parse(msg), id: from, name }));
   peer.on('connect', () => {
-    console.log('connect');
     dispatch({
       type: 'UPDATE_PEER', peer, to: from, state: 'READY',
     });
@@ -84,7 +82,6 @@ export const forwardPing = (contactlist, message, id) => () => {
   const reciever = Array.from(contactlist)
     .filter(([key, { state }]) => state === 'READY' && lastPeer !== key)
     .map(([, { peer }]) => peer);
-  console.log('forwardping', message);
   const sendPeerConnection = peer => peer.send(JSON.stringify({
     type: 'PING', ...rest, lastPeer: id,
   }));
@@ -98,7 +95,6 @@ export const ping = (contactlist, message, id) => (dispatch) => {
   const reciever = Array.from(contactlist)
     .filter(([key, { state }]) => state === 'READY' && lastPeer !== key)
     .map(([, { peer }]) => peer);
-  console.log('PING', rest.from, rest.to);
 
   const sendPeerConnection = (data, peer) => peer.send(JSON.stringify({
     type: 'PING', ...rest, lastPeer: id, data,
@@ -118,7 +114,6 @@ export const onMessageChange = message => (dispatch) => {
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
   const reciever = contactlist.get(+sendTo) ? [contactlist.get(+sendTo)] : contactlist;
-  console.log(reciever, +sendTo);
   reciever.forEach(({ peer, state }) => state === 'READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message })));
   dispatch({ type: 'SEND_MESSAGE', message });
 };

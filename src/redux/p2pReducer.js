@@ -9,16 +9,15 @@ export default (oldState = {
   if (type === 'NEW_PEER') {
     const { id, ...peer } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    contactlist.set(id, { ...peer });
+    contactlist.set(id, { ...peer, buddy: true });
     return { ...oldState, contactlist };
   }
   if (type === 'UPDATE_PEER') {
     const { to, from, ...peer } = rest;
     const key = peer.peer.initiator ? to : from;
-    console.log(rest);
     const contactlist = new Map([...oldState.contactlist]);
     const oldPeer = contactlist.get(key);
-    contactlist.set(key, { ...oldPeer, ...peer });
+    contactlist.set(key, { ...oldPeer, ...peer, buddy: false });
     return { ...oldState, contactlist, connectingData: {} };
   }
 
@@ -35,7 +34,6 @@ export default (oldState = {
 
   if (type === 'PING') {
     const { name, id, ...connectingData } = rest;
-    console.log('PING', rest);
     return { ...oldState, connectingData };
   }
 
