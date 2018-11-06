@@ -9,10 +9,10 @@ export default connect(
   state => ({ ...state.p2pReducer, ...state.connectionReducer }),
   dispatch => bindActionCreators(Actions, dispatch),
 )(({
-  createPeerConnection, name, contactlist, connectingData, id,
+  createPeerConnection, name, contactlist, from, id,
 }) => (
   <button
-    onClick={() => createPeerConnection(contactlist, connectingData, id)}
+    onClick={() => createPeerConnection(contactlist, from, id)}
     type="button"
     className="list-group-item-action list-group-item"
   >

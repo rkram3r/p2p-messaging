@@ -14,11 +14,21 @@ export default (oldState = {
   }
   if (type === 'UPDATE_PEER') {
     const { to, from, ...peer } = rest;
+    console.log(rest);
     const key = peer.peer.initiator ? to : from;
     const contactlist = new Map([...oldState.contactlist]);
     const oldPeer = contactlist.get(key);
     contactlist.set(key, { ...oldPeer, ...peer, buddy: false });
     return { ...oldState, contactlist, connectingData: {} };
+  }
+
+  if (type === 'UPDATE_PEER_STATE') {
+    const { id, state, connection } = rest;
+    console.log(rest);
+    const contactlist = new Map([...oldState.contactlist]);
+    const oldPeer = contactlist.get(id);
+    contactlist.set(id, { ...oldPeer, state, connection });
+    return { ...oldState, contactlist };
   }
 
   if (type === 'MESSAGE') {

@@ -39,11 +39,14 @@ export const createConnection = (name, address) => async (dispatch) => {
   right.on('signal', data => socket.emit('p2p-connect', { data, name, id }));
 };
 
-export const createPeerConnection = (contactlist, message, id) => (dispatch) => {
+export const createPeerConnection = (contactlist, idFrom, id) => (dispatch) => {
+  const { connection } = contactlist.get(idFrom);
+  console.log(connection, idFrom);
   const newPeer = new Peer({ trickle: false });
   const {
     lastPeer, from, ...rest
-  } = message;
+  } = connection;
+
   const reciever = Array.from(contactlist)
     .filter(([key, { state }]) => state === 'READY' && lastPeer === key)
     .map(([, { peer }]) => peer);
@@ -62,13 +65,13 @@ export const createPeerConnection = (contactlist, message, id) => (dispatch) => 
       type: 'UPDATE_PEER', peer: newPeer, from, state: 'READY',
     });
   });
-  newPeer.signal(message.data);
+  newPeer.signal(connection.data);
 };
 
 export const finalizeConnection = (contactlist, message) => (dispatch) => {
   const { from, data } = message;
-  const { peer, name } = contactlist.get(from);
-
+  const { peer, name, connection } = contactlist.get(from);
+  console.log(message, connection);
   peer.on('data', msg => dispatch({ ...JSON.parse(msg), id: from, name }));
   peer.on('connect', () => {
     dispatch({
@@ -89,6 +92,12 @@ export const forwardPing = (contactlist, message, id) => () => {
   reciever.forEach(sendPeerConnection);
 };
 
+export const updatePeer = (id, state, connection) => (dispatch) => {
+  console.log(id, state, connection);
+  dispatch({
+    type: 'UPDATE_PEER_STATE', id, state, connection,
+  });
+};
 
 export const ping = (contactlist, message, id) => (dispatch) => {
   const newPeer = new Peer({ initiator: true, trickle: false });

@@ -20,6 +20,7 @@ class Contactlist extends React.Component {
       id,
       finalizeConnection,
       forwardPing,
+      updatePeer,
     } = this.props;
 
     if (prevProps.contactlist.size !== contactlist.size) {
@@ -30,6 +31,8 @@ class Contactlist extends React.Component {
 
     if (peerFrom && peerFrom.state === 'CONNECTING' && connectingData.to && id === connectingData.to) {
       finalizeConnection(contactlist, connectingData);
+    } else if (peerFrom && peerFrom.state !== 'ASK_TO_CONNECT' && id === connectingData.to) {
+      updatePeer(connectingData.from, 'ASK_TO_CONNECT', connectingData);
     }
     if (peerTo && peerTo.state !== 'CONNECTING' && connectingData.to && id !== connectingData.to) {
       forwardPing(contactlist, connectingData, id);
@@ -38,8 +41,7 @@ class Contactlist extends React.Component {
 
   render() {
     const {
-      contactlist, match: { params: { sendTo } }, id,
-      connectingData,
+      contactlist, match: { params: { sendTo } },
     } = this.props;
     return (
       <div className="my-3 p-3 bg-white rounded shadow-sm">
@@ -54,8 +56,8 @@ class Contactlist extends React.Component {
                 if (state === 'CONNECTING') {
                   return <Connecting key={to} name={name} />;
                 }
-                if (id === connectingData.to && to === connectingData.from) {
-                  return <AskToConnect key={to} name={name} />;
+                if (state === 'ASK_TO_CONNECT') {
+                  return <AskToConnect key={to} name={name} from={to} />;
                 }
                 return <NotConnected key={to} peer={{ to, name }} />;
               })}
