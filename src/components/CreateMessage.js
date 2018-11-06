@@ -4,10 +4,10 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import * as Actions from '../redux/actions';
 
-export default connect(
+export default withRouter(connect(
   state => ({ ...state.p2pReducer }),
   dispatch => bindActionCreators(Actions, dispatch),
-)(withRouter(({
+)(({
   message, onMessageChange, send, contactlist,
   match: { params: { sendTo } },
 }) => (
@@ -22,12 +22,13 @@ export default connect(
           onChange={({ target: { value } }) => onMessageChange(value)}
         />
       </div>
+      {console.log(sendTo)}
       <div className="col-sm-4 float-right">
         <button
           type="submit"
           className="float-right btn-block btn btn-primary"
           onClick={() => {
-            send({ contactlist, sendTo }, message);
+            send({ contactlist, sendTo: sendTo || [] }, message);
           }}
         >
 Send
