@@ -28,7 +28,6 @@ const createId = () => Math.floor(1000000000 * Math.random());
 export const createConnection = (name, address) => async (dispatch) => {
   const socket = io(address, { transports: ['websocket'], secure: true });
   const id = createId();
-  console.log(id);
   dispatch({ type: 'PUBLIC_KEY', id, name });
   const left = new Peer({ initiator: true, trickle: false });
   const right = new Peer({ trickle: false });
@@ -41,7 +40,6 @@ export const createConnection = (name, address) => async (dispatch) => {
 
 export const createPeerConnection = (contactlist, idFrom, id) => (dispatch) => {
   const { connection } = contactlist.get(idFrom);
-  console.log(connection, idFrom);
   const newPeer = new Peer({ trickle: false });
   const {
     lastPeer, from, ...rest
@@ -70,8 +68,7 @@ export const createPeerConnection = (contactlist, idFrom, id) => (dispatch) => {
 
 export const finalizeConnection = (contactlist, message) => (dispatch) => {
   const { from, data } = message;
-  const { peer, name, connection } = contactlist.get(from);
-  console.log(message, connection);
+  const { peer, name } = contactlist.get(from);
   peer.on('data', msg => dispatch({ ...JSON.parse(msg), id: from, name }));
   peer.on('connect', () => {
     dispatch({
@@ -93,7 +90,6 @@ export const forwardPing = (contactlist, message, id) => () => {
 };
 
 export const updatePeer = (id, state, connection) => (dispatch) => {
-  console.log(id, state, connection);
   dispatch({
     type: 'UPDATE_PEER_STATE', id, state, connection,
   });
@@ -123,8 +119,16 @@ export const onMessageChange = message => (dispatch) => {
 };
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
-  const reciever = sendTo.length !== 0 ? JSON.parse(sendTo).map(x => contactlist.get(x)) : contactlist;
-  reciever.forEach(({ peer, state }) => state === 'READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message })));
+  const reciever = sendTo.length !== 0
+    ? JSON.parse(sendTo).map(x => contactlist.get(x)) : contactlist;
+  reciever.forEach((contact) => {
+    if (contact) {
+      const { peer, state } = contact;
+      if (state === 'READY') {
+        peer.send(JSON.stringify({ type: 'MESSAGE', message }));
+      }
+    }
+  });
   dispatch({ type: 'SEND_MESSAGE', message });
 };
 

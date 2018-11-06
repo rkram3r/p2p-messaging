@@ -22,7 +22,6 @@ export default withRouter(connect(
           onChange={({ target: { value } }) => onMessageChange(value)}
         />
       </div>
-      {console.log(sendTo)}
       <div className="col-sm-4 float-right">
         <button
           type="submit"
