@@ -9,7 +9,7 @@ import Messages from '../Messages';
 import Ready from './Ready';
 import Connecting from './Connecting';
 import AskToConnect from './AskToConnect';
-import Ping from './Ping';
+import NotConnected from './NotConnected';
 
 class Contactlist extends React.Component {
   componentDidUpdate(prevProps) {
@@ -30,9 +30,9 @@ class Contactlist extends React.Component {
 
     if (peerFrom && peerFrom.state === 'CONNECTING' && connectingData.to && id === connectingData.to) {
       finalizeConnection(contactlist, connectingData);
-    } else
+    }
     if (peerTo && peerTo.state !== 'CONNECTING' && connectingData.to && id !== connectingData.to) {
-      forwardPing(contactlist, connectingData);
+      forwardPing(contactlist, connectingData, id);
     }
   }
 
@@ -57,7 +57,7 @@ class Contactlist extends React.Component {
                 if (id === connectingData.to && to === connectingData.from) {
                   return <AskToConnect key={to} name={name} />;
                 }
-                return <Ping key={to} peer={{ to, name }} />;
+                return <NotConnected key={to} peer={{ to, name }} />;
               })}
             </div>
           </div>
