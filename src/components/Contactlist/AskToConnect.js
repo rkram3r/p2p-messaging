@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import AskToConnect from 'react-feather/dist/icons/phone-incoming';
+import AskToConnect from 'react-feather/dist/icons/help-circle';
 import * as Actions from '../../redux/actions';
 
 export default connect(

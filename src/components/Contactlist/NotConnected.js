@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import NotConnected from 'react-feather/dist/icons/phone-off';
+import NotConnected from 'react-feather/dist/icons/x-circle';
 import * as Actions from '../../redux/actions';
 
 export default connect(
