@@ -6,7 +6,8 @@ import { Provider } from 'react-redux';
 // Polyfill set
 import 'core-js/es6/set';
 import 'babel-polyfill';
-import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap';
+import './variables.scss';
 import Router from './Router';
 import store from './store';
 
@@ -18,5 +19,6 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={history} />
   </Provider>,
+  // eslint-disable-next-line no-undef
   document.getElementById('root'),
 );

@@ -3,7 +3,7 @@ import {
   BrowserRouter, Route, Switch,
 } from 'react-router-dom';
 
-import App from './components/App';
+import App from './pages/App';
 
 export default () => (
   <BrowserRouter>

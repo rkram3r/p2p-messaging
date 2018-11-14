@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import AskToConnect from 'react-feather/dist/icons/help-circle';
-import * as Actions from '../../redux/actions';
+import * as Actions from '../../logic/actions';
 
 export default connect(
   state => ({ ...state.p2pReducer, ...state.connectionReducer }),

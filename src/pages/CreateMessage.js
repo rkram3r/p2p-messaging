@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import * as Actions from '../redux/actions';
+import * as Actions from '../logic/actions';
 
 export default withRouter(connect(
   state => ({ ...state.p2pReducer }),

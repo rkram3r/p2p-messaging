@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import * as Actions from '../redux/actions';
+import * as Actions from '../logic/actions';
 import './Messages.scss';
 
 export default connect(

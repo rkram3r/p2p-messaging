@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
 
-import * as Actions from '../../redux/actions';
+import * as Actions from '../../logic/actions';
 import Messages from '../Messages';
 import Ready from './Ready';
 import Connecting from './Connecting';
@@ -44,11 +44,11 @@ class Contactlist extends React.Component {
       contactlist, match: { params: { sendTo } },
     } = this.props;
     return (
-      <div className="my-3 p-3 bg-white rounded shadow-sm">
+      <div className="p-3 bg-white shadow-sm">
         <div className="row">
-          <div className="my-3 p-3 bg-white rounded shadow-sm col-sm-4">
+          <div className="p-3 bg-white shadow-sm col-sm-4">
             <h5>Contactlist</h5>
-            <div className="list-group">
+            <div>
               {Array.from(contactlist).map(([to, { name, state }]) => {
                 if (state === 'READY') {
                   return <Ready key={to} {...{ sendTo, to, name }} />;
