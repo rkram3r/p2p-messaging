@@ -44,5 +44,28 @@
     "node-sass": "^4.9.4",
     "nodemon": "^1.18.5",
     "parcel": "^1.10.3"
+  },
+  "eslintConfig": {
+    "extends": "airbnb",
+    "rules": {
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".js",
+            ".jsx"
+          ]
+        }
+      ],
+      "react/prop-types": [
+        false
+      ],
+      "no-unused-expressions": [
+        2,
+        {
+          "allowShortCircuit": true
+        }
+      ]
+    }
   }
 }

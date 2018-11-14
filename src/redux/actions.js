@@ -2,40 +2,31 @@
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 
-const onConnect = (connection, socket, dispatch) => {
-  const { type, peer, ...rest } = connection;
-
-  if (type !== 'answer') {
-    socket.close();
-  }
-  dispatch({
-    type: 'NEW_PEER', peer, ...rest, state: 'READY',
-  });
-};
-
-const onSocketConnect = (value, left, right, socket, dispatch) => {
-  const { data, data: { type }, ...key } = value;
-  const peer = data.type === 'answer' ? left : right;
-  peer.on('connect', () => onConnect({ ...key, peer, type }, socket, dispatch));
-  peer.signal(data);
-
-  peer.on('data', message => dispatch({ ...JSON.parse(message), ...key }));
-};
-
 const createId = () => Math.floor(1000000000 * Math.random());
-
 
 export const createConnection = (name, address) => async (dispatch) => {
   const socket = io(address, { transports: ['websocket'], secure: true });
   const id = createId();
   dispatch({ type: 'PUBLIC_KEY', id, name });
-  const left = new Peer({ initiator: true, trickle: false });
-  const right = new Peer({ trickle: false });
+  const leftBuddy = new Peer({ initiator: true, trickle: false });
+  const rightBuddy = new Peer({ trickle: false });
 
-  socket.on('p2p-connect', data => onSocketConnect(data, left, right, socket, dispatch));
+  socket.on('p2p-connect', (message) => {
+    const { data, data: { type }, ...key } = message;
+    const peer = type === 'answer' ? leftBuddy : rightBuddy;
+    peer.on('connect', () => {
+      dispatch({
+        type: 'NEW_PEER', peer, ...key, state: 'READY',
+      });
+      type !== 'answer' && socket.close();
+    });
+    peer.signal(data);
 
-  left.on('signal', data => socket.emit('p2p-connect', { data, name, id }));
-  right.on('signal', data => socket.emit('p2p-connect', { data, name, id }));
+    peer.on('data', d => dispatch({ ...JSON.parse(d), ...key }));
+  });
+
+  leftBuddy.on('signal', data => socket.emit('p2p-connect', { data, name, id }));
+  rightBuddy.on('signal', data => socket.emit('p2p-connect', { data, name, id }));
 };
 
 export const createPeerConnection = (contactlist, idFrom, id) => (dispatch) => {

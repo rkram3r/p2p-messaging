@@ -37,6 +37,7 @@ export default (oldState = {
   }
 
   if (type === 'PUBLIC_KEY') {
+    console.log(rest);
     return { ...oldState, ...rest };
   }
 
