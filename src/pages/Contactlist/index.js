@@ -31,7 +31,7 @@ class Contactlist extends React.Component {
 
     if (peerFrom && peerFrom.state === 'CONNECTING' && connectingData.to && id === connectingData.to) {
       finalizeConnection(contactlist, connectingData);
-    } else if (peerFrom && peerFrom.state !== 'ASK_TO_CONNECT' && id === connectingData.to) {
+    } else if (peerFrom && peerFrom.state !== 'ASK_TO_CONNECT' && peerFrom.state !== 'READY' && id === connectingData.to) {
       updatePeer(connectingData.from, 'ASK_TO_CONNECT', connectingData);
     }
     if (peerTo && peerTo.state !== 'CONNECTING' && connectingData.to && id !== connectingData.to) {
@@ -44,27 +44,23 @@ class Contactlist extends React.Component {
       contactlist, match: { params: { sendTo } },
     } = this.props;
     return (
-      <div className="p-3 bg-white shadow-sm">
-        <div className="row">
-          <div className="p-3 bg-white shadow-sm col-sm-4">
-            <h5>Contactlist</h5>
-            <div>
-              {Array.from(contactlist).map(([to, { name, state }]) => {
-                if (state === 'READY') {
-                  return <Ready key={to} {...{ sendTo, to, name }} />;
-                }
-                if (state === 'CONNECTING') {
-                  return <Connecting key={to} name={name} />;
-                }
-                if (state === 'ASK_TO_CONNECT') {
-                  return <AskToConnect key={to} name={name} from={to} />;
-                }
-                return <NotConnected key={to} peer={{ to, name }} />;
-              })}
-            </div>
-          </div>
-          <Messages />
+      <div className="row">
+        <div className="shadow-sm col-sm-4 col-lg-2 py-2">
+          {Array.from(contactlist).map(([to, { name, state }]) => {
+            if (state === 'READY') {
+              return <Ready key={to} {...{ sendTo, to, name }} />;
+            }
+            if (state === 'CONNECTING') {
+              return <Connecting key={to} name={name} />;
+            }
+            if (state === 'ASK_TO_CONNECT') {
+              return <AskToConnect key={to} name={name} from={to} />;
+            }
+            return <NotConnected key={to} peer={{ to, name }} />;
+          })}
         </div>
+        <div className="col-sm-1 col-lg-1" />
+        <Messages />
       </div>
     );
   }

@@ -5,6 +5,7 @@ export default (oldState = {
   recievedMessages: [],
   connectingData: {},
 }, action) => {
+  console.log(action);
   const { type, ...rest } = action;
   if (type === 'NEW_PEER') {
     const { id, ...peer } = rest;

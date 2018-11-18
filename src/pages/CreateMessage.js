@@ -11,28 +11,26 @@ export default withRouter(connect(
   message, onMessageChange, send, contactlist,
   match: { params: { sendTo } },
 }) => (
-  <div className="my-3 p-3 bg-white rounded shadow-sm">
-    <div className="form-group row">
-      <div className="col-sm-8">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Message"
-          value={message}
-          onChange={({ target: { value } }) => onMessageChange(value)}
-        />
-      </div>
-      <div className="col-sm-4 float-right">
-        <button
-          type="submit"
-          className="float-right btn-block btn btn-primary"
-          onClick={() => {
-            send({ contactlist, sendTo: sendTo || [] }, message);
-          }}
-        >
+
+  <div className="form-group row shadow-sm py-3">
+    <div className="col-sm-8 col-lg-10">
+      <input
+        className="form-control"
+        placeholder="Message"
+        value={message}
+        onChange={({ target: { value } }) => onMessageChange(value)}
+      />
+    </div>
+    <div className="col-sm-4 col-lg-2">
+      <button
+        type="submit"
+        className="float-right btn btn-block btn-primary"
+        onClick={() => {
+          send({ contactlist, sendTo: sendTo || [] }, message);
+        }}
+      >
 Send
-        </button>
-      </div>
+      </button>
     </div>
   </div>
 )));
