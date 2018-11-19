@@ -12,9 +12,8 @@ import AskToConnect from './AskToConnect';
 import NotConnected from './NotConnected';
 
 class Contactlist extends React.Component {
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     const {
-      broadcastContactlist,
       contactlist,
       connectingData,
       id,
@@ -23,9 +22,6 @@ class Contactlist extends React.Component {
       askToConnect,
     } = this.props;
 
-    if (prevProps.contactlist.size !== contactlist.size) {
-      broadcastContactlist(contactlist);
-    }
     const peerTo = contactlist.get(connectingData.to) || false;
     const peerFrom = contactlist.get(connectingData.from) || false;
 

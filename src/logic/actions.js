@@ -111,20 +111,6 @@ export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
   dispatch({ type: 'SEND_MESSAGE', message });
 };
 
-export const broadcastContactlist = contactlist => () => {
-  const contactlistWithoutPeers = Array
-    .from(contactlist)
-    .map(([key, { peer, ...rest }]) => [key, { ...rest, state: 'NOT_CONNECTED' }]);
-
-  Array.from(contactlist).forEach(([key, { peer, state }]) => {
-    const filteredList = contactlistWithoutPeers.filter(([id]) => id !== key);
-    const message = JSON.stringify({ type: 'CONTACTLIST', contactlist: filteredList });
-    if (state === 'PEER_READY') {
-      peer.send(message);
-    }
-  });
-};
-
 export const connectionChange = connection => (dispatch) => {
   dispatch({ type: 'CONNECTION_CHANGE', connection });
 };
