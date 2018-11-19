@@ -10,11 +10,12 @@ import p2pReducer from './logic/p2pReducer';
 
 const history = createHistory();
 const reduxRouterMiddleware = routerMiddleware(history);
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const store = createStore(
   combineReducers({ connectionReducer, p2pReducer }),
   undefined,
-  compose(applyMiddleware(thunk, reduxRouterMiddleware)),
+  composeEnhancers(applyMiddleware(thunk, reduxRouterMiddleware)),
 );
 
 export default store;

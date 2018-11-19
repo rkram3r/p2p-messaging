@@ -7,7 +7,9 @@ const createId = () => Math.floor(1000000000 * Math.random());
 export const createConnection = (name, address) => async (dispatch) => {
   const socket = io(address, { transports: ['websocket'], secure: true });
   const id = createId();
+
   dispatch({ type: 'PUBLIC_KEY', id, name });
+
   const leftBuddy = new Peer({ initiator: true, trickle: false });
   const rightBuddy = new Peer({ trickle: false });
 
@@ -15,9 +17,7 @@ export const createConnection = (name, address) => async (dispatch) => {
     const { data, data: { type }, ...key } = message;
     const peer = type === 'answer' ? leftBuddy : rightBuddy;
     peer.on('connect', () => {
-      dispatch({
-        type: 'NEW_PEER', peer, ...key, state: 'READY',
-      });
+      dispatch({ type: 'PEER_READY', peer, ...key });
       type !== 'answer' && socket.close();
     });
     peer.signal(data);
@@ -32,27 +32,21 @@ export const createConnection = (name, address) => async (dispatch) => {
 export const createPeerConnection = (contactlist, idFrom, id) => (dispatch) => {
   const { connection } = contactlist.get(idFrom);
   const newPeer = new Peer({ trickle: false });
-  const {
-    lastPeer, from, ...rest
-  } = connection;
+  const { lastPeer, from } = connection;
 
   const reciever = Array.from(contactlist)
-    .filter(([key, { state }]) => state === 'READY' && lastPeer === key)
+    .filter(([key, { state }]) => state === 'PEER_READY' && lastPeer === key)
     .map(([, { peer }]) => peer);
   const sendPeerConnection = (data, peer) => peer.send(JSON.stringify({
     type: 'PING', from: id, to: from, lastPeer: id, data,
   }));
   newPeer.on('signal', (data) => {
     reciever.forEach(peer => sendPeerConnection(data, peer));
-    dispatch({
-      type: 'UPDATE_PEER', peer: newPeer, from, ...rest, state: 'CONNECTING',
-    });
+    dispatch({ type: 'CONNECTING_PEER', peer: newPeer, key: from });
   });
   newPeer.on('data', msg => dispatch({ ...JSON.parse(msg), id }));
   newPeer.on('connect', () => {
-    dispatch({
-      type: 'UPDATE_PEER', peer: newPeer, from, state: 'READY',
-    });
+    dispatch({ type: 'SET_PEER_READY', peer: newPeer, key: from });
   });
   newPeer.signal(connection.data);
 };
@@ -62,9 +56,7 @@ export const finalizeConnection = (contactlist, message) => (dispatch) => {
   const { peer, name } = contactlist.get(from);
   peer.on('data', msg => dispatch({ ...JSON.parse(msg), id: from, name }));
   peer.on('connect', () => {
-    dispatch({
-      type: 'UPDATE_PEER', peer, to: from, state: 'READY',
-    });
+    dispatch({ type: 'SET_PEER_READY', peer, key: from });
   });
   peer.signal(data);
 };
@@ -72,7 +64,7 @@ export const finalizeConnection = (contactlist, message) => (dispatch) => {
 export const forwardPing = (contactlist, message, id) => () => {
   const { lastPeer, ...rest } = message;
   const reciever = Array.from(contactlist)
-    .filter(([key, { state, buddy }]) => state === 'READY' && lastPeer !== key && buddy)
+    .filter(([key, { state, buddy }]) => state === 'PEER_READY' && lastPeer !== key && buddy)
     .map(([, { peer }]) => peer);
   const sendPeerConnection = peer => peer.send(JSON.stringify({
     type: 'PING', ...rest, lastPeer: id,
@@ -80,17 +72,15 @@ export const forwardPing = (contactlist, message, id) => () => {
   reciever.forEach(sendPeerConnection);
 };
 
-export const updatePeer = (id, state, connection) => (dispatch) => {
-  dispatch({
-    type: 'UPDATE_PEER_STATE', id, state, connection,
-  });
+export const askToConnect = (id, connection) => (dispatch) => {
+  dispatch({ type: 'ASK_TO_CONNECT', id, connection });
 };
 
 export const ping = (contactlist, message, id) => (dispatch) => {
   const newPeer = new Peer({ initiator: true, trickle: false });
   const { lastPeer, ...rest } = message;
   const reciever = Array.from(contactlist)
-    .filter(([key, { state, buddy }]) => state === 'READY' && lastPeer !== key && buddy)
+    .filter(([key, { state, buddy }]) => state === 'PEER_READY' && lastPeer !== key && buddy)
     .map(([, { peer }]) => peer);
 
   const sendPeerConnection = (data, peer) => peer.send(JSON.stringify({
@@ -98,9 +88,7 @@ export const ping = (contactlist, message, id) => (dispatch) => {
   }));
   newPeer.on('signal', (data) => {
     reciever.forEach(peer => sendPeerConnection(data, peer));
-    dispatch({
-      type: 'UPDATE_PEER', ...rest, peer: newPeer, state: 'CONNECTING',
-    });
+    dispatch({ type: 'CONNECTING_PEER', key: rest.to, peer: newPeer });
   });
   newPeer.on('connect', () => console.log('connect'));
 };
@@ -115,7 +103,7 @@ export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
   reciever.forEach((contact) => {
     if (contact) {
       const { peer, state } = contact;
-      if (state === 'READY') {
+      if (state === 'PEER_READY') {
         peer.send(JSON.stringify({ type: 'MESSAGE', message }));
       }
     }
@@ -131,7 +119,7 @@ export const broadcastContactlist = contactlist => () => {
   Array.from(contactlist).forEach(([key, { peer, state }]) => {
     const filteredList = contactlistWithoutPeers.filter(([id]) => id !== key);
     const message = JSON.stringify({ type: 'CONTACTLIST', contactlist: filteredList });
-    if (state === 'READY') {
+    if (state === 'PEER_READY') {
       peer.send(message);
     }
   });

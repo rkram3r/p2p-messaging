@@ -2,31 +2,42 @@
 export default (oldState = {
   contactlist: new Map(),
   message: '',
+  id: '',
+  name: '',
   recievedMessages: [],
   connectingData: {},
 }, action) => {
   console.log(action);
   const { type, ...rest } = action;
-  if (type === 'NEW_PEER') {
+  if (type === 'PEER_READY') {
     const { id, ...peer } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    contactlist.set(id, { ...peer, buddy: true });
+    contactlist.set(id, { ...peer, buddy: true, state: 'PEER_READY' });
     return { ...oldState, contactlist };
   }
-  if (type === 'UPDATE_PEER') {
-    const { to, from, ...peer } = rest;
-    const key = peer.peer.initiator ? to : from;
+
+  if (type === 'CONNECTING_PEER') {
+    const { key, peer } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    const oldPeer = contactlist.get(key);
-    contactlist.set(key, { ...oldPeer, ...peer, buddy: false });
+    contactlist.set(key, {
+      ...contactlist.get(key), peer, buddy: false, state: 'CONNECTING_PEER',
+    });
     return { ...oldState, contactlist, connectingData: {} };
   }
 
-  if (type === 'UPDATE_PEER_STATE') {
-    const { id, state, connection } = rest;
+  if (type === 'SET_PEER_READY') {
+    const { key, peer } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    const oldPeer = contactlist.get(id);
-    contactlist.set(id, { ...oldPeer, state, connection });
+    contactlist.set(key, {
+      ...contactlist.get(key), peer, buddy: false, state: 'PEER_READY',
+    });
+    return { ...oldState, contactlist, connectingData: {} };
+  }
+
+  if (type === 'ASK_TO_CONNECT') {
+    const { id, connection } = rest;
+    const contactlist = new Map([...oldState.contactlist]);
+    contactlist.set(id, { ...contactlist.get(id), state: 'ASK_TO_CONNECT', connection });
     return { ...oldState, contactlist };
   }
 
@@ -38,8 +49,8 @@ export default (oldState = {
   }
 
   if (type === 'PUBLIC_KEY') {
-    console.log(rest);
-    return { ...oldState, ...rest };
+    const { id, name } = rest;
+    return { ...oldState, id, name };
   }
 
   if (type === 'PING') {
