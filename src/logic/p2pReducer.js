@@ -7,12 +7,13 @@ export default (oldState = {
   recievedMessages: [],
   connectingData: {},
 }, action) => {
-  console.log(action);
   const { type, ...rest } = action;
   if (type === 'PEER_READY') {
-    const { id, ...peer } = rest;
+    const { id, peer, name } = rest;
     const contactlist = new Map([...oldState.contactlist]);
-    contactlist.set(id, { ...peer, buddy: true, state: 'PEER_READY' });
+    contactlist.set(id, {
+      peer, name, buddy: true, state: 'PEER_READY',
+    });
     return { ...oldState, contactlist };
   }
 
