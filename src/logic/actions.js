@@ -45,9 +45,7 @@ export const createPeerConnection = (contactlist, idFrom, id) => (dispatch) => {
     dispatch({ type: 'CONNECTING_PEER', peer: newPeer, key: from });
   });
   newPeer.on('data', msg => dispatch({ ...JSON.parse(msg), id }));
-  newPeer.on('connect', () => {
-    dispatch({ type: 'SET_PEER_READY', peer: newPeer, key: from });
-  });
+  newPeer.on('connect', () => dispatch({ type: 'SET_PEER_READY', peer: newPeer, key: from }));
   newPeer.signal(connection.data);
 };
 
@@ -68,9 +66,8 @@ export const ping = (contactlist, message, id) => (dispatch) => {
   newPeer.on('connect', () => console.log('connect'));
 };
 
-export const onMessageChange = message => (dispatch) => {
-  dispatch({ type: 'MESSAGE_CHANGE', message });
-};
+export const onMessageChange = message => dispatch => dispatch({ type: 'MESSAGE_CHANGE', message });
+export const connectionChange = connection => dispatch => dispatch({ type: 'CONNECTION_CHANGE', connection });
 
 export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
   const reciever = sendTo.length !== 0
@@ -78,14 +75,8 @@ export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
   reciever.forEach((contact) => {
     if (contact) {
       const { peer, state } = contact;
-      if (state === 'PEER_READY') {
-        peer.send(JSON.stringify({ type: 'MESSAGE', message }));
-      }
+      state === 'PEER_READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message }));
     }
   });
   dispatch({ type: 'SEND_MESSAGE', message });
-};
-
-export const connectionChange = connection => (dispatch) => {
-  dispatch({ type: 'CONNECTION_CHANGE', connection });
 };
