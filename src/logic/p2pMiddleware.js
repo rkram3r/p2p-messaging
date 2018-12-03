@@ -78,7 +78,7 @@ export const forwardPing = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
   const { type, ...connectingData } = action;
 
-  if (connectingData) {
+  if (type === 'PING') {
     const peerTo = contactlist.get(connectingData.to) || false;
 
     if (peerTo && peerTo.state !== 'CONNECTING_PEER' && connectingData.to && id !== connectingData.to) {
