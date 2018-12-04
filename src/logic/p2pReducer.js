@@ -42,7 +42,8 @@ export default (oldState = {
   }
 
   if (type === 'MESSAGE') {
-    const { name, message } = rest;
+    const { message, from } = rest;
+    const { name } = oldState.contactlist.get(from);
     const recievedMessages = [...oldState.recievedMessages,
       { name, message, recieved: new Date() }];
     return { ...oldState, recievedMessages };

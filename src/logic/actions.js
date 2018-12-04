@@ -69,13 +69,13 @@ export const ping = (contactlist, message, id) => (dispatch) => {
 export const onMessageChange = message => dispatch => dispatch({ type: 'MESSAGE_CHANGE', message });
 export const connectionChange = connection => dispatch => dispatch({ type: 'CONNECTION_CHANGE', connection });
 
-export const send = ({ contactlist, sendTo }, message) => (dispatch) => {
+export const send = ({ contactlist, sendTo }, message, from) => (dispatch) => {
   const reciever = sendTo.length !== 0
     ? JSON.parse(sendTo).map(x => contactlist.get(x)) : contactlist;
   reciever.forEach((contact) => {
     if (contact) {
       const { peer, state } = contact;
-      state === 'PEER_READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message }));
+      state === 'PEER_READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message, from }));
     }
   });
   dispatch({ type: 'SEND_MESSAGE', message });

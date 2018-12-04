@@ -8,7 +8,7 @@ export default withRouter(connect(
   state => ({ ...state.p2pReducer }),
   dispatch => bindActionCreators(Actions, dispatch),
 )(({
-  message, onMessageChange, send, contactlist,
+  message, onMessageChange, send, contactlist, id,
   match: { params: { sendTo } },
 }) => (
 
@@ -26,7 +26,7 @@ export default withRouter(connect(
         type="submit"
         className="float-right btn btn-block btn-primary"
         onClick={() => {
-          send({ contactlist, sendTo: sendTo || [] }, message);
+          send({ contactlist, sendTo: sendTo || [] }, message, id);
         }}
       >
 Send
