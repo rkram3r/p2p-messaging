@@ -70,8 +70,10 @@ export const onMessageChange = message => dispatch => dispatch({ type: 'MESSAGE_
 export const connectionChange = connection => dispatch => dispatch({ type: 'CONNECTION_CHANGE', connection });
 
 export const send = ({ contactlist, sendTo }, message, from) => (dispatch) => {
-  const reciever = sendTo.length !== 0
-    ? JSON.parse(sendTo).map(x => contactlist.get(x)) : contactlist;
+  const selectedReciever = sendTo.length !== 0
+    ? JSON.parse(sendTo).filter(x => contactlist.get(x)).map(x => contactlist.get(x)) : contactlist;
+  const reciever = selectedReciever.length === 0 ? contactlist : selectedReciever;
+
   reciever.forEach((contact) => {
     if (contact) {
       const { peer, state } = contact;
