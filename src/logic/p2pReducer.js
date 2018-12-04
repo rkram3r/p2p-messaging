@@ -5,7 +5,6 @@ export default (oldState = {
   id: '',
   name: '',
   recievedMessages: [],
-  connectingData: {},
 }, action) => {
   const { type, ...rest } = action;
   if (type === 'PEER_READY') {
@@ -23,7 +22,7 @@ export default (oldState = {
     contactlist.set(key, {
       ...contactlist.get(key), peer, buddy: false, state: 'CONNECTING_PEER',
     });
-    return { ...oldState, contactlist, connectingData: {} };
+    return { ...oldState, contactlist };
   }
 
   if (type === 'SET_PEER_READY') {
@@ -32,7 +31,7 @@ export default (oldState = {
     contactlist.set(key, {
       ...contactlist.get(key), peer, buddy: false, state: 'PEER_READY',
     });
-    return { ...oldState, contactlist, connectingData: {} };
+    return { ...oldState, contactlist };
   }
 
   if (type === 'ASK_TO_CONNECT') {
@@ -52,11 +51,6 @@ export default (oldState = {
   if (type === 'PUBLIC_KEY') {
     const { id, name } = rest;
     return { ...oldState, id, name };
-  }
-
-  if (type === 'PING') {
-    const { name, id, ...connectingData } = rest;
-    return { ...oldState, connectingData };
   }
 
   if (type === 'MESSAGE_CHANGE') {

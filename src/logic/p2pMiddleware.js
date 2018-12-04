@@ -23,10 +23,10 @@ export const sendContactlistToBuddy = store => next => (action) => {
 
 export const broadcastContactlist = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
-  const { type, ...rest } = action;
+  const { type, lastPeer } = action;
   if (type === 'CONTACTLIST') {
     Array.from(contactlist).forEach(([key, { peer, buddy }], _, array) => {
-      if (key !== rest.lastPeer && buddy && peer) {
+      if (key !== lastPeer && buddy && peer) {
         const filteredList = new Map([...array.filter(([x]) => x !== key)]);
         const message = JSON.stringify({
           type: 'CONTACTLIST', lastPeer: id, contactlist: filteredList,
@@ -41,14 +41,15 @@ export const broadcastContactlist = store => next => (action) => {
 
 export const finalizeConnection = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
-  const { type, ...connectingData } = action;
-  const peerFrom = contactlist.get(connectingData.from) || false;
+  const {
+    type, from, to, data,
+  } = action;
+  const peerFrom = contactlist.get(from) || false;
   if (type !== 'PING') {
     return next(action);
   }
   if (peerFrom && peerFrom.state === 'CONNECTING_PEER'
-   && connectingData.to && id === connectingData.to) {
-    const { from, data } = connectingData;
+   && to && id === to) {
     const { peer, name } = contactlist.get(from);
     peer.on('data', msg => store.dispatch({ ...JSON.parse(msg), id: from, name }));
     peer.on('connect', () => store.dispatch({ type: 'SET_PEER_READY', peer, key: from }));
@@ -60,15 +61,17 @@ export const finalizeConnection = store => next => (action) => {
 
 export const askToConnect = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
-  const { type, ...connectingData } = action;
+  const {
+    type, from, to, ...rest
+  } = action;
 
   if (type !== 'PING') {
     return next(action);
   }
-  const peerFrom = contactlist.get(connectingData.from) || false;
+  const peerFrom = contactlist.get(from) || false;
 
-  if (peerFrom && peerFrom.state === 'NOT_CONNECTED' && id === connectingData.to) {
-    store.dispatch({ type: 'ASK_TO_CONNECT', id: connectingData.from, connection: connectingData });
+  if (peerFrom && peerFrom.state === 'NOT_CONNECTED' && id === to) {
+    store.dispatch({ type: 'ASK_TO_CONNECT', id: from, connection: { from, to, ...rest } });
   }
 
   return next(action);
@@ -76,18 +79,19 @@ export const askToConnect = store => next => (action) => {
 
 export const forwardPing = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
-  const { type, ...connectingData } = action;
+  const {
+    type, from, to, lastPeer, ...rest
+  } = action;
 
   if (type === 'PING') {
-    const peerTo = contactlist.get(connectingData.to) || false;
+    const peerTo = contactlist.get(to) || false;
 
-    if (peerTo && peerTo.state !== 'CONNECTING_PEER' && connectingData.to && id !== connectingData.to) {
-      const { lastPeer, ...rest } = connectingData;
+    if (peerTo && peerTo.state !== 'CONNECTING_PEER' && to && id !== to) {
       const reciever = Array.from(contactlist)
         .filter(([key, { state, buddy }]) => state === 'PEER_READY' && lastPeer !== key && buddy)
         .map(([, { peer }]) => peer);
       const sendPeerConnection = peer => peer.send(JSON.stringify({
-        type: 'PING', ...rest, lastPeer: id,
+        type: 'PING', ...rest, from, to, lastPeer: id,
       }));
       reciever.forEach(sendPeerConnection);
     }
