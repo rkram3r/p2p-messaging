@@ -7,12 +7,14 @@
     "start": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
     "watch:server": "cross-env PORT=3030 nodemon ./server.js --watch server.js",
     "start:server": "node ./server.js --ssl --cors",
-    "watch:client": "parcel ./src/index.html --open"
+    "watch:client": "NODE_ENV=DEBUG parcel ./src/index.html --open"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.1.3",
     "core-js": "^2.5.7",
+    "crypto-js": "^3.1.9-1",
+    "ganache-cli": "^6.2.3",
     "history": "^4.7.2",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.4",
@@ -28,6 +30,7 @@
     "simple-peer": "^9.1.2",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
+    "utils": "^0.3.1",
     "web3": "^1.0.0-beta.36"
   },
   "devDependencies": {
@@ -48,6 +51,10 @@
   },
   "eslintConfig": {
     "extends": "airbnb",
+    "globals": {
+      "window": true,
+      "document": true
+    },
     "rules": {
       "react/jsx-filename-extension": [
         1,

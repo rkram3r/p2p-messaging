@@ -1,11 +1,36 @@
 
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
+import stringHash from './stringHash';
+import { abi, address } from '../constants';
 
 const createId = () => Math.floor(1000000000 * Math.random());
 
-export const createConnection = (name, address) => async (dispatch) => {
-  const socket = io(address, { transports: ['websocket'], secure: true });
+export const store = message => () => {
+  const { web3 } = window;
+  if (web3) {
+    const { eth: { contract } } = web3;
+    const hash = stringHash(message);
+
+    const contractAt = contract(abi).at(address);
+    contractAt.store(hash, (error, result) => console.log(error, result));
+  }
+};
+
+export const verify = message => () => {
+  const { web3 } = window;
+  if (web3) {
+    const { eth: { defaultAccount, contract } } = web3;
+
+    const hash = stringHash(message);
+
+    const contractAt = contract(abi).at(address);
+    contractAt.verify(defaultAccount, hash, (e, r) => console.log(e, r));
+  }
+};
+
+export const createConnection = (name, serverAddress) => async (dispatch) => {
+  const socket = io(serverAddress, { transports: ['websocket'], secure: true });
   const id = createId();
 
   dispatch({ type: 'PUBLIC_KEY', id, name });
