@@ -23,12 +23,10 @@ export default connect(
         );
       }
       return (
-        <div key={recieved} className="my-2 speech-bubble-other">
-          <button type="button" onClick={() => verify(peer, message, messageId)}>
-            <span className="speech-bubble-name">{name || myName}</span>
-            {message}
-            {verified && <Ready className="float-right text-success badge" />}
-          </button>
+        <div key={recieved} className="my-2 speech-bubble-other" onClick={() => verify(peer, message, messageId)}>
+          <span className="speech-bubble-name">{name || myName}</span>
+          {message}
+          {verified && <Ready className="float-right text-success badge" />}
         </div>
       );
     })}
