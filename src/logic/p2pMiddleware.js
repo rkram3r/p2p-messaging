@@ -84,7 +84,7 @@ export const verify = store => next => (action) => {
   if (type === 'VERIFY_MESSAGE') {
     const { ethereum, web3 } = window;
     if (!(ethereum || web3)) {
-      store.dispatch({ type: 'ERROR', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
+      store.dispatch({ type: 'WARNING', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
       return next(action);
     }
 
@@ -96,9 +96,14 @@ export const verify = store => next => (action) => {
     const contractAt = window.web3.eth.contract(abi).at(address);
     contractAt.verify(defaultAccount, hash, (error, result) => {
       if (error) {
-        store.dispatch({ type: 'ERROR', message: error });
+        store.dispatch({ type: 'WARNING', message: error });
       } else {
-        store.dispatch({ type: 'VERIFIED', result, messageId });
+        const { c } = result;
+        if (c[0] > 0) {
+          store.dispatch({ type: 'VERIFIED', result, messageId });
+        } else {
+          store.dispatch({ type: 'WARNING', message: 'Wrong Entry.' });
+        }
       }
     });
   }

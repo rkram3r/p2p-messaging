@@ -7,10 +7,9 @@ import { abi, address } from '../constants';
 const createId = () => Math.floor(1000000000 * Math.random());
 
 export const verify = (peer, message, messageId) => async (dispatch) => {
-  console.log('verify');
   const { ethereum, web3 } = window;
   if (!(ethereum || web3)) {
-    dispatch({ type: 'ERROR', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
+    dispatch({ type: 'WARNING', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
     return;
   }
 
@@ -19,7 +18,7 @@ export const verify = (peer, message, messageId) => async (dispatch) => {
     try {
       await ethereum.enable();
     } catch (error) {
-      dispatch({ type: 'ERROR', message: 'User denied account access...' });
+      dispatch({ type: 'WARNING', message: 'User denied account access...' });
     }
   } else {
     window.web3 = new Web3(web3.currentProvider);
@@ -31,7 +30,7 @@ export const verify = (peer, message, messageId) => async (dispatch) => {
   const contractAt = eth.contract(abi).at(address);
   contractAt.store(hash, (error, result) => {
     if (error) {
-      dispatch({ type: 'ERROR', message: error });
+      dispatch({ type: 'WARNING', message: error });
     } else {
       dispatch({ type: 'VERIFIED', result, messageId });
       peer.send(JSON.stringify({

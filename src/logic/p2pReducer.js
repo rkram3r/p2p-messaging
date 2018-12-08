@@ -2,6 +2,7 @@
 export default (oldState = {
   contactlist: new Map(),
   message: '',
+  warningMessage: '',
   id: '',
   name: '',
   recievedMessages: [],
@@ -44,7 +45,6 @@ export default (oldState = {
   if (type === 'MESSAGE') {
     const { message, from, messageId } = rest;
     const contact = oldState.contactlist.get(from);
-    console.log(messageId);
     const recievedMessages = [...oldState.recievedMessages,
       {
         message,
@@ -68,17 +68,15 @@ export default (oldState = {
 
   if (type === 'VERIFIED') {
     const { messageId } = rest;
-    console.log(rest);
-    console.log(oldState.recievedMessages, messageId);
     return {
       ...oldState,
       recievedMessages:
       oldState.recievedMessages.map(x => (x.messageId === messageId ? { ...x, verified: true } : x)),
     };
   }
-  if (type === 'ERROR') {
-    console.log(rest);
-    return { ...oldState, ...rest };
+  if (type === 'WARNING') {
+    const { message } = rest;
+    return { ...oldState, warningMessage: message };
   }
 
   if (type === 'CONTACTLIST') {
@@ -88,7 +86,6 @@ export default (oldState = {
 
   if (type === 'SEND_MESSAGE') {
     const { message, messageId } = action;
-    console.log(messageId);
     const recievedMessages = [...oldState.recievedMessages,
       {
         myMessage: true,

@@ -16,17 +16,26 @@ export default connect(
       if (myMessage) {
         return (
           <div key={recieved} className="my-2 speech-bubble-me">
-            <span className="speech-bubble-name">{name || myName}</span>
+            <span className="speech-bubble-name">{myName}</span>
             {message}
             {verified && <Ready className="float-right text-success badge" />}
           </div>
         );
       }
+      if (verified) {
+        return (
+          <div key={recieved} className="my-2 speech-bubble-other">
+            <span className="speech-bubble-name">{name}</span>
+            {message}
+            <Ready className="float-right text-success badge" />
+          </div>
+        );
+      }
       return (
         <div key={recieved} className="my-2 speech-bubble-other" onClick={() => verify(peer, message, messageId)}>
-          <span className="speech-bubble-name">{name || myName}</span>
+          <span className="verify">Verify!</span>
+          <span className="speech-bubble-name">{name}</span>
           {message}
-          {verified && <Ready className="float-right text-success badge" />}
         </div>
       );
     })}
