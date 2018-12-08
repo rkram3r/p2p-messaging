@@ -80,11 +80,9 @@ export const askToConnect = store => next => (action) => {
   return next(action);
 };
 export const verify = store => next => (action) => {
-  const { message, type } = action;
-  console.log(action);
+  const { message, type, messageId } = action;
   if (type === 'VERIFY_MESSAGE') {
     const { ethereum, web3 } = window;
-    console.log(ethereum, web3);
     if (!(ethereum || web3)) {
       store.dispatch({ type: 'ERROR', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
       return next(action);
@@ -100,7 +98,7 @@ export const verify = store => next => (action) => {
       if (error) {
         store.dispatch({ type: 'ERROR', message: error });
       } else {
-        store.dispatch({ type: 'VERIFY', result });
+        store.dispatch({ type: 'VERIFIED', result, messageId });
       }
     });
   }

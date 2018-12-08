@@ -4,7 +4,6 @@ export default (oldState = {
   message: '',
   id: '',
   name: '',
-  verifyMessage: '',
   recievedMessages: [],
 }, action) => {
   const { type, ...rest } = action;
@@ -43,11 +42,17 @@ export default (oldState = {
   }
 
   if (type === 'MESSAGE') {
-    const { message, from, verifyMessage } = rest;
-    const { name } = oldState.contactlist.get(from);
+    const { message, from, messageId } = rest;
+    const contact = oldState.contactlist.get(from);
+    console.log(messageId);
     const recievedMessages = [...oldState.recievedMessages,
       {
-        name, message, recieved: new Date(), verifyMessage,
+        message,
+        recieved: new Date(),
+        verified: false,
+        messageId,
+        ...contact,
+        myMessage: false,
       }];
     return { ...oldState, recievedMessages };
   }
@@ -60,7 +65,18 @@ export default (oldState = {
   if (type === 'MESSAGE_CHANGE') {
     return { ...oldState, ...rest };
   }
-  if (type === 'VERIFY_CHANGE') {
+
+  if (type === 'VERIFIED') {
+    const { messageId } = rest;
+    console.log(rest);
+    console.log(oldState.recievedMessages, messageId);
+    return {
+      ...oldState,
+      recievedMessages:
+      oldState.recievedMessages.map(x => (x.messageId === messageId ? { ...x, verified: true } : x)),
+    };
+  }
+  if (type === 'ERROR') {
     console.log(rest);
     return { ...oldState, ...rest };
   }
@@ -71,9 +87,16 @@ export default (oldState = {
   }
 
   if (type === 'SEND_MESSAGE') {
-    const { message } = action;
+    const { message, messageId } = action;
+    console.log(messageId);
     const recievedMessages = [...oldState.recievedMessages,
-      { myMessage: true, message, recieved: new Date() }];
+      {
+        myMessage: true,
+        message,
+        recieved: new Date(),
+        messageId,
+        verified: false,
+      }];
     return { ...oldState, recievedMessages, message: '' };
   }
 
