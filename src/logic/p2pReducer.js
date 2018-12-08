@@ -4,6 +4,7 @@ export default (oldState = {
   message: '',
   id: '',
   name: '',
+  verifyMessage: '',
   recievedMessages: [],
 }, action) => {
   const { type, ...rest } = action;
@@ -42,10 +43,12 @@ export default (oldState = {
   }
 
   if (type === 'MESSAGE') {
-    const { message, from } = rest;
+    const { message, from, verifyMessage } = rest;
     const { name } = oldState.contactlist.get(from);
     const recievedMessages = [...oldState.recievedMessages,
-      { name, message, recieved: new Date() }];
+      {
+        name, message, recieved: new Date(), verifyMessage,
+      }];
     return { ...oldState, recievedMessages };
   }
 
@@ -55,6 +58,10 @@ export default (oldState = {
   }
 
   if (type === 'MESSAGE_CHANGE') {
+    return { ...oldState, ...rest };
+  }
+  if (type === 'VERIFY_CHANGE') {
+    console.log(rest);
     return { ...oldState, ...rest };
   }
 

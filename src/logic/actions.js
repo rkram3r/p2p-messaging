@@ -6,27 +6,69 @@ import { abi, address } from '../constants';
 
 const createId = () => Math.floor(1000000000 * Math.random());
 
-export const store = message => () => {
-  const { web3 } = window;
-  if (web3) {
-    const { eth: { contract } } = web3;
-    const hash = stringHash(message);
-
-    const contractAt = contract(abi).at(address);
-    contractAt.store(hash, (error, result) => console.log(error, result));
+export const store = (message, reciever) => async (dispatch) => {
+  const { ethereum, web3 } = window;
+  console.log('message', ethereum, web3);
+  if (!(ethereum || web3)) {
+    console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    return;
   }
+
+  if (ethereum) {
+    window.web3 = new Web3(ethereum);
+    try {
+      await ethereum.enable();
+    } catch (error) {
+      console.log('User denied account access...');
+    }
+  } else {
+    window.web3 = new Web3(web3.currentProvider);
+  }
+
+  const { eth } = window.web3;
+  console.log(window.web3.eth);
+  const hash = stringHash(message);
+
+  const contractAt = eth.contract(abi).at(address);
+  contractAt.store(hash, (error, result) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(result);
+      reciever.forEach((contact) => {
+        if (contact) {
+          const { peer, state } = contact;
+          state === 'PEER_READY' && peer.send(JSON.stringify({ type: 'VERIFY_MESSAGE', message, result }));
+        }
+      });
+    }
+  });
 };
 
-export const verify = message => () => {
-  const { web3 } = window;
-  if (web3) {
-    const { eth: { defaultAccount, contract } } = web3;
+export const verify = message => async () => {
+  const { ethereum, web3 } = window;
 
-    const hash = stringHash(message);
-
-    const contractAt = contract(abi).at(address);
-    contractAt.verify(defaultAccount, hash, (e, r) => console.log(e, r));
+  if (!(ethereum || web3)) {
+    console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    return;
   }
+
+  if (ethereum) {
+    window.web3 = new Web3(ethereum);
+    try {
+      await ethereum.enable();
+    } catch (error) {
+      console.log('User denied account access...');
+    }
+  } else {
+    window.web3 = new Web3(web3.currentProvider);
+  }
+  const { eth: { defaultAccount, contract } } = web3;
+
+  const hash = stringHash(message);
+
+  const contractAt = contract(abi).at(address);
+  contractAt.verify(defaultAccount, hash, (e, r) => console.log(e, r));
 };
 
 export const createConnection = (name, serverAddress) => async (dispatch) => {
@@ -93,17 +135,19 @@ export const ping = (contactlist, message, id) => (dispatch) => {
 
 export const onMessageChange = message => dispatch => dispatch({ type: 'MESSAGE_CHANGE', message });
 export const connectionChange = connection => dispatch => dispatch({ type: 'CONNECTION_CHANGE', connection });
+export const verifyChange = verifyMessage => dispatch => dispatch({ type: 'VERIFY_CHANGE', verifyMessage });
 
-export const send = ({ contactlist, sendTo }, message, from) => (dispatch) => {
+export const send = ({ contactlist, sendTo }, message, from, verifyMessage) => (dispatch) => {
   const selectedReciever = sendTo.length !== 0
     ? JSON.parse(sendTo).filter(x => contactlist.get(x)).map(x => contactlist.get(x)) : contactlist;
   const reciever = selectedReciever.length === 0 ? contactlist : selectedReciever;
-
   reciever.forEach((contact) => {
     if (contact) {
       const { peer, state } = contact;
       state === 'PEER_READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message, from }));
     }
   });
+  verifyMessage && dispatch(store(message, reciever));
+
   dispatch({ type: 'SEND_MESSAGE', message });
 };

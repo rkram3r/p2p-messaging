@@ -10,7 +10,7 @@ export default connect(
 )(({ recievedMessages, myName }) => (
   <div className="col-sm-7 col-lg-9">
     {recievedMessages.map(({
-      myMessage, name, message, recieved,
+      myMessage, name, message, recieved, verify,
     }) => (
       <div key={recieved} className={`my-2 ${myMessage ? 'speech-bubble-me' : 'speech-bubble-other'}`}>
         <span className="speech-bubble-name">{name || myName}</span>

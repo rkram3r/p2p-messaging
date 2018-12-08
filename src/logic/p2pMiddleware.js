@@ -1,3 +1,6 @@
+import { abi, address } from '../constants';
+import stringHash from './stringHash';
+
 export const sendContactlistToBuddy = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
   const { type, ...rest } = action;
@@ -76,7 +79,33 @@ export const askToConnect = store => next => (action) => {
 
   return next(action);
 };
+export const verify = store => next => (action) => {
+  const { message, type } = action;
+  console.log(action);
+  if (type === 'VERIFY_MESSAGE') {
+    const { ethereum, web3 } = window;
+    console.log(ethereum, web3);
+    if (!(ethereum || web3)) {
+      store.dispatch({ type: 'ERROR', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
+      return next(action);
+    }
 
+    window.web3 = new Web3(web3.currentProvider);
+    const { eth: { defaultAccount } } = window.web3;
+
+    const hash = stringHash(message);
+
+    const contractAt = window.web3.eth.contract(abi).at(address);
+    contractAt.verify(defaultAccount, hash, (error, result) => {
+      if (error) {
+        store.dispatch({ type: 'ERROR', message: error });
+      } else {
+        store.dispatch({ type: 'VERIFY', result });
+      }
+    });
+  }
+  return next(action);
+};
 export const forwardPing = store => next => (action) => {
   const { p2pReducer: { contactlist, id } } = store.getState();
   const {
