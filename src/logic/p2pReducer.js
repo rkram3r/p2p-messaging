@@ -2,6 +2,7 @@
 export default (oldState = {
   contactlist: new Map(),
   message: '',
+  warningMessage: '',
   id: '',
   name: '',
   recievedMessages: [],
@@ -42,10 +43,17 @@ export default (oldState = {
   }
 
   if (type === 'MESSAGE') {
-    const { message, from } = rest;
-    const { name } = oldState.contactlist.get(from);
+    const { message, from, messageId } = rest;
+    const contact = oldState.contactlist.get(from);
     const recievedMessages = [...oldState.recievedMessages,
-      { name, message, recieved: new Date() }];
+      {
+        message,
+        recieved: new Date(),
+        verified: false,
+        messageId,
+        ...contact,
+        myMessage: false,
+      }];
     return { ...oldState, recievedMessages };
   }
 
@@ -58,15 +66,34 @@ export default (oldState = {
     return { ...oldState, ...rest };
   }
 
+  if (type === 'VERIFIED') {
+    const { messageId } = rest;
+    return {
+      ...oldState,
+      recievedMessages:
+      oldState.recievedMessages.map(x => (x.messageId === messageId ? { ...x, verified: true } : x)),
+    };
+  }
+  if (type === 'WARNING') {
+    const { message } = rest;
+    return { ...oldState, warningMessage: message };
+  }
+
   if (type === 'CONTACTLIST') {
     const { contactlist } = rest;
     return { ...oldState, contactlist: new Map([...contactlist, ...oldState.contactlist]) };
   }
 
   if (type === 'SEND_MESSAGE') {
-    const { message } = action;
+    const { message, messageId } = action;
     const recievedMessages = [...oldState.recievedMessages,
-      { myMessage: true, message, recieved: new Date() }];
+      {
+        myMessage: true,
+        message,
+        recieved: new Date(),
+        messageId,
+        verified: false,
+      }];
     return { ...oldState, recievedMessages, message: '' };
   }
 

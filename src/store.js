@@ -9,7 +9,7 @@ import connectionReducer from './logic/connectionReducer';
 import p2pReducer from './logic/p2pReducer';
 import {
   broadcastContactlist, finalizeConnection, askToConnect, forwardPing,
-  sendContactlistToBuddy,
+  sendContactlistToBuddy, verify,
 } from './logic/p2pMiddleware';
 
 const history = createHistory();
@@ -20,7 +20,8 @@ const store = createStore(
   combineReducers({ connectionReducer, p2pReducer }),
   undefined,
   composeEnhancers(
-    applyMiddleware(finalizeConnection, askToConnect, forwardPing, broadcastContactlist, sendContactlistToBuddy, thunk, reduxRouterMiddleware),
+    applyMiddleware(finalizeConnection, askToConnect, forwardPing,
+      broadcastContactlist, sendContactlistToBuddy, thunk, reduxRouterMiddleware, verify),
   ),
 );
 

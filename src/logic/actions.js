@@ -1,11 +1,47 @@
 
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
+import stringHash from './stringHash';
+import { abi, address } from '../constants';
 
 const createId = () => Math.floor(1000000000 * Math.random());
 
-export const createConnection = (name, address) => async (dispatch) => {
-  const socket = io(address, { transports: ['websocket'], secure: true });
+export const verify = (peer, message, messageId) => async (dispatch) => {
+  const { ethereum, web3 } = window;
+  if (!(ethereum || web3)) {
+    dispatch({ type: 'WARNING', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
+    return;
+  }
+
+  if (ethereum) {
+    window.web3 = new Web3(ethereum);
+    try {
+      await ethereum.enable();
+    } catch (error) {
+      dispatch({ type: 'WARNING', message: 'User denied account access...' });
+    }
+  } else {
+    window.web3 = new Web3(web3.currentProvider);
+  }
+
+  const { eth } = window.web3;
+  const hash = stringHash(`${message}${messageId}`);
+
+  const contractAt = eth.contract(abi).at(address);
+  contractAt.store(hash, (error, result) => {
+    if (error) {
+      dispatch({ type: 'WARNING', message: error });
+    } else {
+      dispatch({ type: 'VERIFIED', result, messageId });
+      peer.send(JSON.stringify({
+        type: 'VERIFY_MESSAGE', message, result, messageId,
+      }));
+    }
+  });
+};
+
+export const createConnection = (name, serverAddress) => async (dispatch) => {
+  const socket = io(serverAddress, { transports: ['websocket'], secure: true });
   const id = createId();
 
   dispatch({ type: 'PUBLIC_KEY', id, name });
@@ -73,12 +109,15 @@ export const send = ({ contactlist, sendTo }, message, from) => (dispatch) => {
   const selectedReciever = sendTo.length !== 0
     ? JSON.parse(sendTo).filter(x => contactlist.get(x)).map(x => contactlist.get(x)) : contactlist;
   const reciever = selectedReciever.length === 0 ? contactlist : selectedReciever;
-
+  const messageId = createId();
   reciever.forEach((contact) => {
     if (contact) {
       const { peer, state } = contact;
-      state === 'PEER_READY' && peer.send(JSON.stringify({ type: 'MESSAGE', message, from }));
+      state === 'PEER_READY' && peer.send(JSON.stringify({
+        type: 'MESSAGE', message, from, messageId,
+      }));
     }
   });
-  dispatch({ type: 'SEND_MESSAGE', message });
+
+  dispatch({ type: 'SEND_MESSAGE', message, messageId });
 };
