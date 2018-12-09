@@ -101,7 +101,6 @@ export const ping = (contactlist, message, id) => (dispatch) => {
     reciever.forEach(peer => sendPeerConnection(data, peer));
     dispatch({ type: 'CONNECTING_PEER', key: rest.to, peer: newPeer });
   });
-  newPeer.on('connect', () => console.log('connect'));
 };
 
 export const onMessageChange = message => dispatch => dispatch({ type: 'MESSAGE_CHANGE', message });

@@ -15,7 +15,7 @@ export default connect(
     {recievedMessages.map(({
       myMessage, name, message, recieved, verified, peer, messageId,
       verifiedFrom,
-    }) => {
+    }, index) => {
       if (myMessage) {
         return (
           <div key={recieved} className="my-2 speech-bubble-me">
@@ -36,7 +36,14 @@ export default connect(
         );
       }
       return (
-        <div key={recieved} className="my-2 speech-bubble-other" onClick={() => verify(peer, message, messageId, id)}>
+        <div
+          key={recieved}
+          role="button"
+          tabIndex={index}
+          className="my-2 speech-bubble-other"
+          onClick={() => verify(peer, message, messageId, id)}
+          onKeyPress={() => verify(peer, message, messageId, id)}
+        >
           <span className="verify">Verify!</span>
           <span className="speech-bubble-name">{name}</span>
           {message}

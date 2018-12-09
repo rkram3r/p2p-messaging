@@ -100,7 +100,7 @@ export const verify = store => next => (action) => {
       } else {
         const { c } = result;
         const { p2pReducer: { id } } = store.getState();
-        if (c[0] > 0) {
+        if (c[0] >= 0) {
           store.dispatch({
             type: 'VERIFIED', result, messageId, from: id,
           });
