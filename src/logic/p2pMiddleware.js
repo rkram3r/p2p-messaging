@@ -99,8 +99,11 @@ export const verify = store => next => (action) => {
         store.dispatch({ type: 'WARNING', message: error });
       } else {
         const { c } = result;
+        const { p2pReducer: { id } } = store.getState();
         if (c[0] > 0) {
-          store.dispatch({ type: 'VERIFIED', result, messageId });
+          store.dispatch({
+            type: 'VERIFIED', result, messageId, from: id,
+          });
         } else {
           store.dispatch({ type: 'WARNING', message: 'Wrong Entry.' });
         }

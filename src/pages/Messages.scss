@@ -28,13 +28,13 @@
     width:100%;
     height:100%;
   }
+  
     &:hover{
       .verify{
         display:table-cell;
         vertical-align: middle;
         background-color: rgba(0, 170, 187,0.8);
-      }
-     
+      } 
     }
   &:first-child {
     margin-top: 0;
@@ -70,5 +70,17 @@
   }
   &:first-child {
     margin-top: 0;
+  }
+  .verified{
+    display:none;
+    position:absolute;
+    right:0;
+    top:100%;
+  }
+
+  &:hover{
+    .verified{
+      display:table-cell;
+    }
   }
 }
