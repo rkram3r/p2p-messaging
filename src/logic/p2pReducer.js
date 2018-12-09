@@ -67,11 +67,19 @@ export default (oldState = {
   }
 
   if (type === 'VERIFIED') {
-    const { messageId } = rest;
+    const { messageId, from } = rest;
     return {
       ...oldState,
       recievedMessages:
-      oldState.recievedMessages.map(x => (x.messageId === messageId ? { ...x, verified: true } : x)),
+      oldState.recievedMessages.map((x) => {
+        if (x.messageId === messageId) {
+          const verifiedFrom = x.verifiedFrom || [];
+          const { name } = oldState.contactlist.get(from) || oldState;
+          verifiedFrom.push(`[${from},${name}]`);
+          return ({ ...x, verified: true, verifiedFrom });
+        }
+        return x;
+      }),
     };
   }
   if (type === 'WARNING') {

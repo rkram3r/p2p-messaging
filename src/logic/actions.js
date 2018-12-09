@@ -6,7 +6,7 @@ import { abi, address } from '../constants';
 
 const createId = () => Math.floor(1000000000 * Math.random());
 
-export const verify = (peer, message, messageId) => async (dispatch) => {
+export const verify = (peer, message, messageId, from) => async (dispatch) => {
   const { ethereum, web3 } = window;
   if (!(ethereum || web3)) {
     dispatch({ type: 'WARNING', message: 'Non-Ethereum browser detected. You should consider trying MetaMask!' });
@@ -32,7 +32,9 @@ export const verify = (peer, message, messageId) => async (dispatch) => {
     if (error) {
       dispatch({ type: 'WARNING', message: error });
     } else {
-      dispatch({ type: 'VERIFIED', result, messageId });
+      dispatch({
+        type: 'VERIFIED', result, messageId, from,
+      });
       peer.send(JSON.stringify({
         type: 'VERIFY_MESSAGE', message, result, messageId,
       }));
@@ -99,7 +101,6 @@ export const ping = (contactlist, message, id) => (dispatch) => {
     reciever.forEach(peer => sendPeerConnection(data, peer));
     dispatch({ type: 'CONNECTING_PEER', key: rest.to, peer: newPeer });
   });
-  newPeer.on('connect', () => console.log('connect'));
 };
 
 export const onMessageChange = message => dispatch => dispatch({ type: 'MESSAGE_CHANGE', message });
