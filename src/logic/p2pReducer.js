@@ -1,10 +1,8 @@
-
 export default (oldState = {
   contactlist: new Map(),
   message: '',
   warningMessage: '',
   id: '',
-  name: '',
   recievedMessages: [],
 }, action) => {
   const { type, ...rest } = action;
@@ -38,6 +36,7 @@ export default (oldState = {
   if (type === 'ASK_TO_CONNECT') {
     const { id, connection } = rest;
     const contactlist = new Map([...oldState.contactlist]);
+    console.log(rest, id, oldState.id, contactlist.get(id));
     contactlist.set(id, { ...contactlist.get(id), state: 'ASK_TO_CONNECT', connection });
     return { ...oldState, contactlist };
   }
