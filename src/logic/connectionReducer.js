@@ -1,6 +1,10 @@
+import { names } from '../constants';
+
+const defaultName = names[Math.floor(Math.random() * names.length)];
+
 export default (oldState = {
-  connection: 'name@localhost:3030',
-  myName: 'name',
+  connection: `${defaultName}@localhost:3030`,
+  myName: defaultName,
   address: 'localhost:3030',
 }, action) => {
   const { type, ...rest } = action;
