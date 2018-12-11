@@ -73,7 +73,6 @@ export default (oldState = {
         if (x.messageId === messageId) {
           const verifiedFrom = x.verifiedFrom || [];
           const { name } = oldState.contactlist.get(from) || oldState;
-          console.log(rest);
           verifiedFrom.push(`[${from},${name}]`);
           return ({ ...x, verified: true, verifiedFrom });
         }
