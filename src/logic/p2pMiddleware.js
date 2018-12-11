@@ -80,7 +80,9 @@ export const askToConnect = store => next => (action) => {
   return next(action);
 };
 export const verify = store => next => (action) => {
-  const { message, type, messageId } = action;
+  const {
+    message, type, messageId, from,
+  } = action;
   if (type === 'VERIFY_MESSAGE') {
     const { ethereum, web3 } = window;
     if (!(ethereum || web3)) {
@@ -99,10 +101,9 @@ export const verify = store => next => (action) => {
         store.dispatch({ type: 'WARNING', message: error });
       } else {
         const { c } = result;
-        const { p2pReducer: { id } } = store.getState();
         if (c[0] >= 0) {
           store.dispatch({
-            type: 'VERIFIED', result, messageId, from: id,
+            type: 'VERIFIED', result, messageId, from,
           });
         } else {
           store.dispatch({ type: 'WARNING', message: 'Wrong Entry.' });

@@ -36,7 +36,7 @@ export const verify = (peer, message, messageId, from) => async (dispatch) => {
         type: 'VERIFIED', result, messageId, from,
       });
       peer.send(JSON.stringify({
-        type: 'VERIFY_MESSAGE', message, result, messageId,
+        type: 'VERIFY_MESSAGE', message, result, messageId, from,
       }));
     }
   });
