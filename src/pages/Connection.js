@@ -19,11 +19,7 @@ export default connect(
       />
     </div>
     <div className="col-sm-4 col-lg-2">
-      <button
-        type="submit"
-        className="float-right btn btn-block btn-primary"
-        onClick={() => { createConnection(myName, address); }}
-      >
+      <button type="submit" className="float-right btn btn-block btn-primary" onClick={() => createConnection(myName, address)}>
       Connect
       </button>
     </div>

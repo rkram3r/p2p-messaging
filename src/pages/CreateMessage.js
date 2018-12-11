@@ -25,9 +25,7 @@ export default withRouter(connect(
       <button
         type="submit"
         className="float-right btn btn-block btn-primary"
-        onClick={() => {
-          send({ contactlist, sendTo: sendTo || [] }, message, id);
-        }}
+        onClick={() => send({ contactlist, sendTo: sendTo || [] }, message, id)}
       >
 Send
       </button>

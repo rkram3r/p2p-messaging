@@ -7,7 +7,7 @@
     "start": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
     "watch:server": "cross-env PORT=3030 nodemon ./server.js --watch server.js",
     "start:server": "node ./server.js --ssl --cors",
-    "watch:client": "NODE_ENV=DEBUG parcel ./src/index.html --open"
+    "watch:client": "parcel ./src/index.html --open"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
