@@ -4,7 +4,8 @@ Fully-distributed, P2P messaging application with an integrated, blockchain-base
 
 ## Requirement
 
-``` Notary.sol has to be deployed. The address has to be set within constants.js ```
+- Notary.sol has to be deployed. 
+- The address has to be set within constants.js
 
 ## Setup
 
