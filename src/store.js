@@ -1,16 +1,18 @@
-import {
-  createStore, applyMiddleware, combineReducers, compose,
-} from 'redux';
-import thunk from 'redux-thunk';
-import { routerMiddleware } from 'react-router-redux';
-import createHistory from 'history/createBrowserHistory';
+import { createStore, applyMiddleware, combineReducers, compose } from "redux";
+import thunk from "redux-thunk";
+import { routerMiddleware } from "react-router-redux";
+import createHistory from "history/createBrowserHistory";
 
-import connectionReducer from './logic/connectionReducer';
-import p2pReducer from './logic/p2pReducer';
+import connectionReducer from "./logic/connectionReducer";
+import p2pReducer from "./logic/p2pReducer";
 import {
-  broadcastContactlist, finalizeConnection, askToConnect, forwardPing,
-  sendContactlistToBuddy, verify,
-} from './logic/p2pMiddleware';
+  broadcastContactlist,
+  finalizeConnection,
+  askToConnect,
+  forwardPing,
+  sendContactlistToBuddy,
+  verify
+} from "./logic/p2pMiddleware";
 
 const history = createHistory();
 const reduxRouterMiddleware = routerMiddleware(history);
@@ -20,9 +22,17 @@ const store = createStore(
   combineReducers({ connectionReducer, p2pReducer }),
   undefined,
   composeEnhancers(
-    applyMiddleware(finalizeConnection, askToConnect, forwardPing,
-      broadcastContactlist, sendContactlistToBuddy, thunk, reduxRouterMiddleware, verify),
-  ),
+    applyMiddleware(
+      finalizeConnection,
+      askToConnect,
+      forwardPing,
+      broadcastContactlist,
+      sendContactlistToBuddy,
+      thunk,
+      reduxRouterMiddleware,
+      verify
+    )
+  )
 );
 
 export default store;

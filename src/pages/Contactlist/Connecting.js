@@ -1,5 +1,5 @@
-import React from 'react';
-import Connecting from 'react-feather/dist/icons/arrow-right-circle';
+import React from "react";
+import Connecting from "react-feather/dist/icons/arrow-right-circle";
 
 export default ({ name }) => (
   <div className="list-group-item-action list-group-item">

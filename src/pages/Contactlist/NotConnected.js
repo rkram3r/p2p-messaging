@@ -1,16 +1,14 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import React from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
-import NotConnected from 'react-feather/dist/icons/x-circle';
-import * as Actions from '../../logic/actions';
+import NotConnected from "react-feather/dist/icons/x-circle";
+import * as Actions from "../../logic/actions";
 
 export default connect(
   state => ({ ...state.p2pReducer, ...state.connectionReducer }),
-  dispatch => bindActionCreators(Actions, dispatch),
-)(({
-  ping, peer: { to, name }, contactlist, id,
-}) => {
+  dispatch => bindActionCreators(Actions, dispatch)
+)(({ ping, peer: { to, name }, contactlist, id }) => {
   const message = { from: id, to, lastPeer: id };
 
   return (
