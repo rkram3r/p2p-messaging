@@ -1,4 +1,3 @@
-import io from "socket.io-client";
 import Peer from "simple-peer";
 import stringHash from "./stringHash";
 import { abi, address } from "../constants";
