@@ -48,16 +48,20 @@ export default class AppContainer extends Container<State> {
     const id = sha256(name);
     const addContact = (contact: IContact) => {
       const { contactlist } = this.state;
+      const { channels } = contact;
+      const { peer } = channels.get(ChannelType.RootChannel);
       contactlist.set(contact.id, contact);
-      const { peer } = contact.channels.get(ChannelType.RootChannel);
-      peer.on("data", (data: string) => {
-        const message: IMessage = JSON.parse(data);
-        const messages = [...this.state.messages, message];
+      this.state.overlayNetwork.setupRootChannel(peer, contact.channels);
+      this.state.overlayNetwork.setupChannels(peer, contact.channels);
 
-        this.setState({ messages });
-      });
       this.setState({ myId: id, name, contactlist: new Map(contactlist) });
     };
-    this.state.overlayNetwork.bootstrap(address, { name, id }, addContact);
+
+    this.state.overlayNetwork.bootstrap(
+      address,
+      { name, id },
+      [ChannelType.Contactlist],
+      addContact
+    );
   }
 }
