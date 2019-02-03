@@ -33,7 +33,7 @@ export default class AppContainer extends Container<State> {
     const newMessage = { from: this.state.myId, id, message, timeStamp };
 
     Array.from(this.state.contactlist).forEach(([_, { channels }]) => {
-      const { peer } = channels.get(ChannelType.RootChannel);
+      const { peer } = channels.get(ChannelType.SendMessages);
       peer.send(JSON.stringify(newMessage));
     });
 
@@ -44,6 +44,18 @@ export default class AppContainer extends Container<State> {
   connectTo(peerId: string) {}
   setupConnection(peerId: string) {}
 
+  getChannelActionMapping() {
+    const actions = new Map<ChannelType, (data: string) => void>();
+    actions.set(ChannelType.Contactlist, data => console.log(data));
+    actions.set(ChannelType.SendMessages, data => {
+      const message = JSON.parse(data);
+      const messages = [...this.state.messages, message];
+      this.setState({ messages });
+    });
+
+    return actions;
+  }
+
   async bootstrap(address: string, name: string) {
     const id = sha256(name);
     const addContact = (contact: IContact) => {
@@ -51,6 +63,7 @@ export default class AppContainer extends Container<State> {
       const { channels } = contact;
       const { peer } = channels.get(ChannelType.RootChannel);
       contactlist.set(contact.id, contact);
+
       this.state.overlayNetwork.setupRootChannel(peer, contact.channels);
       this.state.overlayNetwork.setupChannels(peer, contact.channels);
 
@@ -60,7 +73,7 @@ export default class AppContainer extends Container<State> {
     this.state.overlayNetwork.bootstrap(
       address,
       { name, id },
-      [ChannelType.Contactlist],
+      this.getChannelActionMapping(),
       addContact
     );
   }

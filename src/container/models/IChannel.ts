@@ -3,7 +3,8 @@ import ISignalingData from "./ISignalingData";
 
 export enum ChannelType {
   RootChannel = 1,
-  Contactlist = 2
+  Contactlist = 2,
+  SendMessages = 4
 }
 
 export enum ContactStatus {
@@ -16,5 +17,4 @@ export enum ContactStatus {
 export default interface IChannel {
   peer?: Peer.Instance;
   status: ContactStatus;
-  signalingData?: ISignalingData;
 }

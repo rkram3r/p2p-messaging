@@ -6,7 +6,7 @@ export default interface IOverlayNetwork {
   bootstrap(
     address: string,
     from: IContact,
-    registerToChannels: Array<ChannelType>,
+    registerToChannels: Map<ChannelType, (data: string) => void>,
     addBuddies: (contact: IContact) => void
   ): void;
   setupChannels(
