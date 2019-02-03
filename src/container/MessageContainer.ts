@@ -1,10 +1,10 @@
 import { Container } from "unstated";
 
-interface IMessageContainer {
+type State = {
   message: string;
-}
+};
 
-export default class MessageContainer extends Container<IMessageContainer> {
+export default class MessageContainer extends Container<State> {
   state = { message: "" };
 
   onMessageChange(message: string) {

@@ -7,7 +7,7 @@ import ConnectingIcon from "react-feather/dist/icons/arrow-right-circle";
 
 import Status from "./Status";
 import AppContainer from "../container/AppContainer";
-import { ContactStatus, ChannelType } from "../container/IContact";
+import { ContactStatus, ChannelType } from "../container/models/IChannel";
 
 export default () => (
   <Subscribe to={[AppContainer]}>

@@ -1,12 +1,12 @@
 import { Container } from "unstated";
 
-interface IConnection {
+type State = {
   address: string;
   myName: string;
   connection: string;
-}
+};
 
-export class ConnectionContainer extends Container<IConnection> {
+export class ConnectionContainer extends Container<State> {
   state = {
     address: "",
     myName: "",

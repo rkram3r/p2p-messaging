@@ -1,22 +1,10 @@
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import IContact, { ContactStatus, ChannelType, IChannel } from "./IContact";
-import IMessage from "./IMessage";
-import { Socket } from "net";
+import IChannel, { ContactStatus, ChannelType } from "./models/IChannel";
+import IContact from "./models/IContact";
+import { SignalingType } from "./models/ISignalingData";
+import IExchange from "./models/IExchange";
 
-enum SignalingType {
-  Answer = "answer",
-  Offer = "offer"
-}
-interface ISignalingData {
-  sdp: string;
-  type: SignalingType;
-}
-
-interface IExchange {
-  from: IContact;
-  signalingData: ISignalingData;
-}
 const channelName = "p2p-connect";
 
 const setupSocket = (

@@ -1,13 +1,11 @@
 {
   "name": "p2p-messaging",
   "version": "1.0.0",
-  "description": "fully-distributed, P2P messaging application with an integrated, blockchain-based notary service.",
-  "private": false,
+  "description": "fully-distributed, P2P messaging application.",
   "scripts": {
-    "start": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
-    "watch:server": "cross-env PORT=3030 nodemon ./server.js --watch server.js",
-    "start:server": "node ./server.js --ssl --cors",
-    "watch:client": "parcel ./src/index.html --open"
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:server": "node ./server.js",
+    "start:client": "parcel ./src/index.html --open"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
@@ -28,8 +26,6 @@
     "@types/simple-peer": "^6.1.5",
     "@types/socket.io": "^2.1.2",
     "concurrently": "^4.0.1",
-    "cross-env": "^5.2.0",
-    "nodemon": "^1.18.5",
     "parcel": "^1.10.3",
     "sass": "^1.16.1",
     "typescript": "^3.3.1"

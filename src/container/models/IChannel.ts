@@ -12,13 +12,7 @@ export enum ContactStatus {
   Ready = 8
 }
 
-export interface IChannel {
+export default interface IChannel {
   peer?: Peer.Instance;
   status: ContactStatus;
-}
-
-export default interface IContact {
-  name: string;
-  id: string;
-  channels?: Map<ChannelType, IChannel>;
 }
