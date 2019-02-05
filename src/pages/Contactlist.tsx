@@ -7,16 +7,14 @@ import ConnectingIcon from "react-feather/dist/icons/arrow-right-circle";
 
 import Status from "./Status";
 import AppContainer from "../container/AppContainer";
-import { ContactStatus, ChannelType } from "../container/models/IChannel";
+import { ContactStatus } from "../container/models/IChannel";
 
 export default () => (
   <Subscribe to={[AppContainer]}>
     {(container: AppContainer) => (
       <div className="shadow-sm col-sm-4 col-lg-2 py-2">
         {Array.from(container.state.contactlist).map(
-          ([id, { channels, name }]) => {
-            const { status } = channels.get(ChannelType.RootChannel);
-
+          ([id, { name, status }]) => {
             if (status === ContactStatus.Ready) {
               return (
                 <Status key={id} status={{ name }}>

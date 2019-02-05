@@ -1,20 +1,11 @@
-import IContact from "./IContact";
-import IChannel, { ChannelType } from "./IChannel";
-import Peer from "simple-peer";
+import { IContactInformation } from "./IContact";
+import { ChannelType } from "./IChannel";
+import TypedEvent from "./TypedEvent";
 
-export default interface IOverlayNetwork {
+export default interface IOverlayNetwork<T> {
   bootstrap(
     address: string,
-    from: IContact,
-    registerToChannels: Map<ChannelType, (data: string) => void>,
-    addBuddies: (contact: IContact) => void
-  ): void;
-  setupChannels(
-    rootPeer: Peer.Instance,
-    channels: Map<ChannelType, IChannel>
-  ): void;
-  setupRootChannel(
-    peer: Peer.Instance,
-    channels: Map<ChannelType, IChannel>
-  ): void;
+    from: IContactInformation,
+    registerToChannels: Map<ChannelType, (data: string) => void>
+  ): TypedEvent<T>;
 }

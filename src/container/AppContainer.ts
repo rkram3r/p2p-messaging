@@ -1,6 +1,5 @@
 import { Container } from "unstated";
 import { sha256 } from "js-sha256";
-
 import { ChannelType } from "./models/IChannel";
 import IContact from "./models/IContact";
 import IMessage from "./models/IMessage";
@@ -11,7 +10,7 @@ type State = {
   myId: string;
   name: string;
   messages: Array<IMessage>;
-  overlayNetwork: IOverlayNetwork;
+  overlayNetwork: IOverlayNetwork<IContact>;
 };
 
 export default class AppContainer extends Container<State> {
@@ -23,7 +22,7 @@ export default class AppContainer extends Container<State> {
     overlayNetwork: null
   };
 
-  constructor(overlayNetwork: IOverlayNetwork) {
+  constructor(overlayNetwork: IOverlayNetwork<IContact>) {
     super();
     this.setState({ overlayNetwork });
   }
@@ -46,8 +45,12 @@ export default class AppContainer extends Container<State> {
 
   getChannelActionMapping() {
     const actions = new Map<ChannelType, (data: string) => void>();
-    actions.set(ChannelType.Contactlist, data => console.log(data));
-    actions.set(ChannelType.SendMessages, data => {
+
+    actions.set(ChannelType.Contactlist, (data: string) => {
+      const message = JSON.parse(data);
+      console.log(message);
+    });
+    actions.set(ChannelType.SendMessages, (data: string) => {
       const message = JSON.parse(data);
       const messages = [...this.state.messages, message];
       this.setState({ messages });
@@ -56,25 +59,34 @@ export default class AppContainer extends Container<State> {
     return actions;
   }
 
-  async bootstrap(address: string, name: string) {
+  sendContacts(contact: IContact) {
+    const contactChannel = contact.channels.get(ChannelType.Contactlist);
+    const contactlistSimplified = Array.from(this.state.contactlist)
+      .filter(([key]) => !(key === contact.id || key === this.state.myId))
+      .map(([_, { name, id }]) => ({ id, name }));
+    if (contactlistSimplified.length !== 0) {
+      const { peer } = contactChannel;
+      peer.on("connect", () => {
+        peer.send(JSON.stringify({ contactlist: contactlistSimplified }));
+      });
+    }
+  }
+
+  bootstrap(address: string, name: string) {
     const id = sha256(name);
-    const addContact = (contact: IContact) => {
-      const { contactlist } = this.state;
-      const { channels } = contact;
-      const { peer } = channels.get(ChannelType.RootChannel);
-      contactlist.set(contact.id, contact);
-
-      this.state.overlayNetwork.setupRootChannel(peer, contact.channels);
-      this.state.overlayNetwork.setupChannels(peer, contact.channels);
-
-      this.setState({ myId: id, name, contactlist: new Map(contactlist) });
-    };
-
-    this.state.overlayNetwork.bootstrap(
+    const from = { name, id };
+    const event = this.state.overlayNetwork.bootstrap(
       address,
-      { name, id },
-      this.getChannelActionMapping(),
-      addContact
+      from,
+      this.getChannelActionMapping()
     );
+
+    event.on((contact: IContact) => {
+      const { contactlist } = this.state;
+      contact.setup();
+      contactlist.set(contact.id, contact);
+      this.setState({ myId: id, name, contactlist: new Map(contactlist) });
+      this.sendContacts(contact);
+    });
   }
 }

@@ -1,16 +1,18 @@
 import Peer from "simple-peer";
-import IChannel, { ContactStatus, ChannelType } from "./IChannel";
-import IContact from "./IContact";
+import { ChannelType } from "./IChannel";
+import IContact, { IContactInformation } from "./IContact";
 import { SignalingType } from "./ISignalingData";
 import IExchange from "./IExchange";
 import IOverlayNetwork from "./IOverlayNetwork";
-import io from "socket.io-client";
+import Contact from "./Contact";
+import TypedEvent from "./TypedEvent";
 
-export default class LinkedListOverlayNetwork implements IOverlayNetwork {
+export default class LinkedListOverlayNetwork
+  implements IOverlayNetwork<IContact> {
   private channelName: string = "p2p-connect";
-  private io: io.SocketIOClientStatic;
+  private io: SocketIOClientStatic;
 
-  constructor(io: io.SocketIOClientStatic) {
+  constructor(io: SocketIOClientStatic) {
     this.io = io;
   }
 
@@ -18,58 +20,31 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     return type === SignalingType.Answer;
   }
 
-  private createChannels(
-    channelTypes: Map<ChannelType, (data: string) => void>,
-    signalType: SignalingType
-  ) {
-    return new Map<ChannelType, IChannel>(
-      Array.from(channelTypes).map(([type, action]) => {
-        const peer = new Peer({
-          initiator: this.isInitiator(signalType)
-        });
-        peer.on("data", action);
-
-        return [type, { peer, status: ContactStatus.NotConnected }] as [
-          ChannelType,
-          IChannel
-        ];
-      })
-    );
-  }
-
   private addMyselfToLinkedList(
-    socket: io.SocketIOClient.Socket,
+    socket: SocketIOClient.Socket,
     channelTypes: Map<ChannelType, (data: string) => void>,
-    addBuddies: (newContact: IContact) => void
+    eventEmitter: TypedEvent<IContact>
   ) {
     const initiator = new Peer({ initiator: true });
     const listener = new Peer();
 
-    socket.on(
-      this.channelName,
-      ({ signalingData, from: { id, name } }: IExchange) => {
-        const peer = this.isInitiator(signalingData.type)
-          ? initiator
-          : listener;
-
-        peer.signal(signalingData);
-        peer.on("connect", () => {
-          if (signalingData.type) {
-            const channels = this.createChannels(
-              channelTypes,
-              signalingData.type
-            );
-            channels.set(ChannelType.RootChannel, {
+    socket.on(this.channelName, ({ signalingData, from }: IExchange) => {
+      const peer = this.isInitiator(signalingData.type) ? initiator : listener;
+      peer.signal(signalingData);
+      peer.on("connect", () => {
+        if (signalingData.type) {
+          eventEmitter.emit(
+            new Contact(
+              from,
               peer,
-              status: ContactStatus.Ready
-            });
-
-            addBuddies({ channels, id, name });
-            signalingData.type === SignalingType.Offer && socket.close();
-          }
-        });
-      }
-    );
+              channelTypes,
+              this.isInitiator(signalingData.type)
+            )
+          );
+          signalingData.type === SignalingType.Offer && socket.close();
+        }
+      });
+    });
 
     return [initiator, listener];
   }
@@ -83,44 +58,22 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
 
   public bootstrap(
     address: string,
-    from: IContact,
-    registerToChannels: Map<ChannelType, (data: string) => void>,
-    addBuddies: (contact: IContact) => void
+    from: IContactInformation,
+    registerToChannels: Map<ChannelType, (data: string) => void>
   ) {
+    const eventEmitter = new TypedEvent<IContact>();
     const socket = this.createSocket(address);
     const peers = this.addMyselfToLinkedList(
       socket,
       registerToChannels,
-      addBuddies
+      eventEmitter
     );
     peers.forEach(peer =>
       peer.on("signal", signalingData =>
         socket.emit(this.channelName, { signalingData, from })
       )
     );
-  }
 
-  public setupRootChannel(
-    peer: Peer.Instance,
-    channels: Map<ChannelType, IChannel>
-  ) {
-    peer.on("data", (data: string) => {
-      const { signalingData, type } = JSON.parse(data);
-      const entry = channels.get(type);
-      entry.peer.signal(signalingData);
-    });
-  }
-
-  public setupChannels(
-    rootPeer: Peer.Instance,
-    channels: Map<ChannelType, IChannel>
-  ) {
-    Array.from(channels)
-      .filter(([type]) => type !== ChannelType.RootChannel)
-      .map(([type, { peer }]) => {
-        peer.on("signal", signalingData => {
-          rootPeer.send(JSON.stringify({ signalingData, type }));
-        });
-      });
+    return eventEmitter;
   }
 }

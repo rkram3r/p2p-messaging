@@ -25,9 +25,10 @@
     "@types/react-router-dom": "^4.3.1",
     "@types/simple-peer": "^6.1.5",
     "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
     "concurrently": "^4.0.1",
     "parcel": "^1.10.3",
     "sass": "^1.16.1",
-    "typescript": "^3.3.1"
+    "typescript": "^3.4.0-dev.20190202"
   }
 }
