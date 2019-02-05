@@ -1,18 +1,15 @@
 import { Container } from "unstated";
 import { sha256 } from "js-sha256";
 import { ChannelType, ContactStatus } from "./models/IChannel";
-import IContact from "./models/IContact";
-import IMessage from "./models/IMessage";
+import IContact, { IContactInformation } from "./models/IContact";
 import IOverlayNetwork from "./models/IOverlayNetwork";
-import IChannelPlugin from "./channelPlugins/IChannelPlugin";
+import IMessage from "./models/IMessage";
 
 export type AppState = {
   contactlist: Map<string, IContact>;
   myId: string;
   name: string;
   messages: Array<IMessage>;
-  overlayNetwork?: IOverlayNetwork<IContact>;
-  plugins?: Map<ChannelType, IChannelPlugin<AppState>>;
 };
 
 export default class AppContainer extends Container<AppState> {
@@ -20,19 +17,26 @@ export default class AppContainer extends Container<AppState> {
     contactlist: new Map<string, IContact>(),
     myId: "",
     name: "",
-    messages: new Array<IMessage>(),
-    overlayNetwork: null,
-    plugins: new Map<ChannelType, IChannelPlugin<AppState>>()
+    messages: new Array<IMessage>()
   };
 
-  constructor(
-    overlayNetwork: IOverlayNetwork<IContact>,
-    plugins: Map<ChannelType, IChannelPlugin<AppState>>
-  ) {
+  constructor(private readonly overlayNetwork: IOverlayNetwork<IContact>) {
     super();
-    this.setState({ overlayNetwork, plugins: new Map(plugins) });
   }
-  send(message: string, reciever?: Array<string>) {
+
+  connectTo(peerId: string) {}
+  setupConnection(peerId: string) {}
+
+  listenOnNewMessages(contact: IContact) {
+    const { peer } = contact.channels.get(ChannelType.SendMessages);
+    peer.on("data", (data: string) => {
+      const message = JSON.parse(data);
+      const messages = [...this.state.messages, message];
+      this.setState({ messages });
+    });
+  }
+
+  send(message: string) {
     const timeStamp = new Date().getTime();
     const id = sha256(message + `${timeStamp}`);
     const newMessage = { from: this.state.myId, id, message, timeStamp };
@@ -48,51 +52,62 @@ export default class AppContainer extends Container<AppState> {
     this.setState({ messages });
   }
 
-  connectTo(peerId: string) {}
-  setupConnection(peerId: string) {}
+  sendContacts(
+    contact: IContact,
+    contactlist: Map<string, IContact>,
+    from: string
+  ) {
+    const contactChannel = contact.channels.get(ChannelType.Contactlist);
+    const newPeers = Array.from(contactlist)
+      .filter(([key]) => key !== contact.id)
+      .map(([_, { name, id }]) => ({ id, name }));
 
-  registerToChannels(contact: IContact) {
-    this.state.plugins;
-    contact.channels.forEach((value, key) => {
-      const { peer } = value;
-      if (this.state.plugins.has(key)) {
-        peer.on("data", (data: string) =>
-          this.setState(this.state.plugins.get(key).onData(data, this.state))
-        );
-      }
-    });
+    if (newPeers.length !== 0) {
+      const { peer } = contactChannel;
+      peer.on("connect", () => {
+        peer.send(JSON.stringify({ newPeers, from }));
+      });
+    }
   }
 
-  sendContacts(contact: IContact) {
-    this.setState(
-      this.state.plugins
-        .get(ChannelType.Contactlist)
-        .send(
-          contact,
-          contact.channels.get(ChannelType.Contactlist),
-          this.state
-        )
-    );
+  registerContactChannel(contact: IContact) {
+    const { peer } = contact.channels.get(ChannelType.Contactlist);
+    peer.on("data", (data: string) => {
+      const { newPeers, from } = JSON.parse(data);
+      const { rootPeer } = this.state.contactlist.get(from);
+      const mappedNewPeers = newPeers.map((contact: IContactInformation) => [
+        contact.id,
+        { ...contact, status: ContactStatus.NotConnected, rootPeer }
+      ]);
+      const contactlist = new Map<string, IContact>([
+        ...mappedNewPeers,
+        ...Array.from(this.state.contactlist)
+      ]);
+
+      this.setState({ contactlist });
+    });
   }
 
   bootstrap(address: string, name: string) {
     const id = sha256(name);
     const from = { name, id };
-    const event = this.state.overlayNetwork.bootstrap(address, from, [
+    const event = this.overlayNetwork.bootstrap(address, from, [
       ChannelType.Contactlist,
       ChannelType.SendMessages
     ]);
 
-    event.on(async (contact: IContact) => {
+    event.on((contact: IContact) => {
       const { contactlist } = this.state;
       contactlist.set(contact.id, contact);
-      this.registerToChannels(contact);
-      await this.setState({
+      this.registerContactChannel(contact);
+      this.listenOnNewMessages(contact);
+      this.setState({
         myId: id,
         name,
         contactlist: new Map(contactlist)
       });
-      this.sendContacts(contact);
+
+      this.sendContacts(contact, contactlist, id);
     });
   }
 }
