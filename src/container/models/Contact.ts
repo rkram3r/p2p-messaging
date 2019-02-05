@@ -1,6 +1,6 @@
 import Peer from "simple-peer";
 import IChannel, { ContactStatus, ChannelType } from "./IChannel";
-import IContact from "./IContact";
+import { IContactInformation } from "./IContact";
 import PeerInstance from "./PeerInstance";
 
 export default class Contact implements IContact {
@@ -10,7 +10,7 @@ export default class Contact implements IContact {
   public status: ContactStatus;
 
   constructor(
-    from: IContact,
+    from: IContactInformation,
     public rootPeer: Peer.Instance,
     channels: Map<ChannelType, (data: string) => void>,
     initiator: boolean
