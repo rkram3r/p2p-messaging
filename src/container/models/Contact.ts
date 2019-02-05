@@ -1,6 +1,6 @@
 import Peer from "simple-peer";
 import IChannel, { ContactStatus, ChannelType } from "./IChannel";
-import { IContactInformation } from "./IContact";
+import IContact, { IContactInformation } from "./IContact";
 import PeerInstance from "./PeerInstance";
 
 export default class Contact implements IContact {
@@ -12,13 +12,18 @@ export default class Contact implements IContact {
   constructor(
     from: IContactInformation,
     public rootPeer: Peer.Instance,
-    channels: Map<ChannelType, (data: string) => void>,
+    channels: Array<ChannelType>,
     initiator: boolean
   ) {
     this.name = from.name;
     this.id = from.id;
     this.channels = this.createChannels(channels, initiator);
     this.initRoot();
+
+    this.status = ContactStatus.Ready;
+    Array.from(this.channels).forEach(([_, channel]) =>
+      channel.peer.setup(this.rootPeer)
+    );
   }
 
   private initRoot() {
@@ -30,25 +35,15 @@ export default class Contact implements IContact {
     this.rootPeer.on("error", erro => console.log(erro));
   }
 
-  private createChannels(
-    channels: Map<ChannelType, (data: string) => void>,
-    initiator: boolean
-  ) {
+  private createChannels(channels: Array<ChannelType>, initiator: boolean) {
     return new Map<ChannelType, IChannel>(
-      Array.from(channels).map(([type, action]) => {
-        const peer = new PeerInstance({ initiator }, type, action);
+      channels.map(type => {
+        const peer = new PeerInstance({ initiator }, type);
         return [type, { peer, status: ContactStatus.NotConnected }] as [
           ChannelType,
           IChannel
         ];
       })
-    );
-  }
-
-  public setup() {
-    this.status = ContactStatus.Ready;
-    Array.from(this.channels).forEach(([_, channel]) =>
-      channel.peer.setup(this.rootPeer)
     );
   }
 }

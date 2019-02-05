@@ -6,6 +6,6 @@ export default interface IOverlayNetwork<T> {
   bootstrap(
     address: string,
     from: IContactInformation,
-    registerToChannels: Map<ChannelType, (data: string) => void>
+    registerToChannels: Array<ChannelType>
   ): TypedEvent<T>;
 }

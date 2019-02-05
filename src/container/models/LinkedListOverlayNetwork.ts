@@ -22,7 +22,7 @@ export default class LinkedListOverlayNetwork
 
   private addMyselfToLinkedList(
     socket: SocketIOClient.Socket,
-    channelTypes: Map<ChannelType, (data: string) => void>,
+    channelTypes: Array<ChannelType>,
     eventEmitter: TypedEvent<IContact>
   ) {
     const initiator = new Peer({ initiator: true });
@@ -59,7 +59,7 @@ export default class LinkedListOverlayNetwork
   public bootstrap(
     address: string,
     from: IContactInformation,
-    registerToChannels: Map<ChannelType, (data: string) => void>
+    registerToChannels: Array<ChannelType>
   ) {
     const eventEmitter = new TypedEvent<IContact>();
     const socket = this.createSocket(address);

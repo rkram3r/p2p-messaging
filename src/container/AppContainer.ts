@@ -43,30 +43,31 @@ export default class AppContainer extends Container<State> {
   connectTo(peerId: string) {}
   setupConnection(peerId: string) {}
 
-  getChannelActionMapping() {
-    const actions = new Map<ChannelType, (data: string) => void>();
+  registerToChannels(contact: IContact) {
+    contact.channels.forEach((value, key) => {
+      if (key === ChannelType.Contactlist) {
+        value.peer.on("data", data => {
+          const { newPeers, from } = JSON.parse(data);
+          const { rootPeer } = this.state.contactlist.get(from);
 
-    actions.set(ChannelType.Contactlist, data => {
-      const { newPeers, from } = JSON.parse(data);
-      const { rootPeer } = this.state.contactlist.get(from);
-
-      const contactlist = new Map<string, IContact>([
-        ...newPeers.map((contact: IContactInformation) => [
-          contact.id,
-          { ...contact, status: ContactStatus.NotConnected, rootPeer }
-        ]),
-        ...Array.from(this.state.contactlist)
-      ]);
-      this.setState({ contactlist });
+          const contactlist = new Map<string, IContact>([
+            ...newPeers.map((contact: IContactInformation) => [
+              contact.id,
+              { ...contact, status: ContactStatus.NotConnected, rootPeer }
+            ]),
+            ...Array.from(this.state.contactlist)
+          ]);
+          this.setState({ contactlist });
+        });
+      }
+      if (key === ChannelType.SendMessages) {
+        value.peer.on("data", data => {
+          const message = JSON.parse(data);
+          const messages = [...this.state.messages, message];
+          this.setState({ messages });
+        });
+      }
     });
-
-    actions.set(ChannelType.SendMessages, (data: string) => {
-      const message = JSON.parse(data);
-      const messages = [...this.state.messages, message];
-      this.setState({ messages });
-    });
-
-    return actions;
   }
 
   sendContacts(contact: IContact) {
@@ -90,16 +91,15 @@ export default class AppContainer extends Container<State> {
   bootstrap(address: string, name: string) {
     const id = sha256(name);
     const from = { name, id };
-    const event = this.state.overlayNetwork.bootstrap(
-      address,
-      from,
-      this.getChannelActionMapping()
-    );
+    const event = this.state.overlayNetwork.bootstrap(address, from, [
+      ChannelType.Contactlist,
+      ChannelType.SendMessages
+    ]);
 
     event.on((contact: IContact) => {
       const { contactlist } = this.state;
-      contact.setup();
       contactlist.set(contact.id, contact);
+      this.registerToChannels(contact);
       this.setState({ myId: id, name, contactlist: new Map(contactlist) });
       this.sendContacts(contact);
     });

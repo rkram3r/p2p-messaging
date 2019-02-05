@@ -8,7 +8,6 @@ export interface IContactInformation {
 
 export default interface IContact extends IContactInformation {
   rootPeer: Peer.Instance;
-  setup(): void;
   status: ContactStatus;
   channels: Map<ChannelType, IChannel>;
 }
