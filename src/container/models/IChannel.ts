@@ -1,12 +1,12 @@
-import PeerInstance from "./PeerInstance";
+import Peer from "simple-peer";
 
 export enum ChannelType {
   RootChannel = 1,
   Contactlist = 2,
-  SendMessages = 4
+  Messages = 4
 }
 
-export enum ContactStatus {
+export enum ChannelState {
   NotConnected,
   AskToConnect,
   Connecting,
@@ -15,6 +15,8 @@ export enum ContactStatus {
 }
 
 export default interface IChannel {
-  peer: PeerInstance;
-  status: ContactStatus;
+  peer: Peer.Instance;
+  peerId: string;
+  state: ChannelState;
+  channelType: ChannelType;
 }

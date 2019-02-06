@@ -1,10 +1,9 @@
 import * as React from "react";
-import { withRouter } from "react-router";
 import { Subscribe } from "unstated";
 import AppContainer from "../container/AppContainer";
 import MessageContainer from "../container/MessageContainer";
 
-export default withRouter(props => (
+export default () => (
   <Subscribe to={[MessageContainer, AppContainer]}>
     {(messageContainer: MessageContainer, appContainer: AppContainer) => (
       <div className="form-group row shadow-sm py-3">
@@ -23,10 +22,7 @@ export default withRouter(props => (
             type="submit"
             className="float-right btn btn-block btn-primary"
             onClick={() => {
-              appContainer.send(
-                messageContainer.state.message,
-                props.match.params
-              );
+              appContainer.send(messageContainer.state.message);
               messageContainer.cleanInput();
             }}
           >
@@ -36,4 +32,4 @@ export default withRouter(props => (
       </div>
     )}
   </Subscribe>
-));
+);

@@ -1,13 +1,6 @@
-import IChannel, { ChannelType, ContactStatus } from "./IChannel";
-import Peer from "simple-peer";
-
-export interface IContactInformation {
-  name: string;
-  id: string;
-}
+import IChannel, { ChannelType } from "./IChannel";
+import IContactInformation from "./IContactInformation";
 
 export default interface IContact extends IContactInformation {
-  rootPeer: Peer.Instance;
-  status: ContactStatus;
-  channels: Map<ChannelType, IChannel>;
+  createNewChannel(type: ChannelType): Promise<IChannel>;
 }

@@ -1,15 +1,23 @@
 import Peer from "simple-peer";
-import { ChannelType } from "./IChannel";
-import IContact, { IContactInformation } from "./IContact";
-import { SignalingType } from "./ISignalingData";
-import IExchange from "./IExchange";
+import IChannel, { ChannelType } from "./IChannel";
+import ISignalingData, { SignalingType } from "./ISignalingData";
 import IOverlayNetwork from "./IOverlayNetwork";
 import Contact from "./Contact";
 import TypedEvent from "./TypedEvent";
+import { sha256 } from "js-sha256";
+import IContact from "./IContact";
+import IContactInformation from "./IContactInformation";
 
-export default class LinkedListOverlayNetwork
-  implements IOverlayNetwork<IContact> {
-  private channelName: string = "p2p-connect";
+type Exchange = {
+  from: IContactInformation;
+  data: ISignalingData;
+};
+
+export default class LinkedListOverlayNetwork implements IOverlayNetwork {
+  public readonly channels = new TypedEvent<IChannel>();
+  public readonly rootChannel = new TypedEvent<IContact>();
+
+  private readonly channelName: string = "p2p-connect";
   private io: SocketIOClientStatic;
 
   constructor(io: SocketIOClientStatic) {
@@ -20,28 +28,29 @@ export default class LinkedListOverlayNetwork
     return type === SignalingType.Answer;
   }
 
-  private addMyselfToLinkedList(
-    socket: SocketIOClient.Socket,
-    channelTypes: Array<ChannelType>,
-    eventEmitter: TypedEvent<IContact>
-  ) {
+  public async createNewChannel(contact: Contact, type: ChannelType) {
+    const channel = await contact.createNewChannel(type);
+    this.channels.emit(channel);
+  }
+
+  private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
     const initiator = new Peer({ initiator: true });
     const listener = new Peer();
 
-    socket.on(this.channelName, ({ signalingData, from }: IExchange) => {
-      const peer = this.isInitiator(signalingData.type) ? initiator : listener;
-      peer.signal(signalingData);
+    socket.on(this.channelName, ({ data, from }: Exchange) => {
+      const peer = this.isInitiator(data.type) ? initiator : listener;
+      peer.signal(data);
       peer.on("connect", () => {
-        if (signalingData.type) {
-          eventEmitter.emit(
+        if (data.type) {
+          this.rootChannel.emit(
             new Contact(
-              from,
+              from.name,
+              from.peerId,
               peer,
-              channelTypes,
-              this.isInitiator(signalingData.type)
+              this.isInitiator(data.type)
             )
           );
-          signalingData.type === SignalingType.Offer && socket.close();
+          data.type === SignalingType.Offer && socket.close();
         }
       });
     });
@@ -49,31 +58,18 @@ export default class LinkedListOverlayNetwork
     return [initiator, listener];
   }
 
-  private createSocket(address: string) {
-    return this.io(address, {
+  public bootstrap(address: string, name: string) {
+    const peerId = sha256(name);
+    const socket = this.io(address, {
       transports: ["websocket"],
       secure: true
     });
-  }
-
-  public bootstrap(
-    address: string,
-    from: IContactInformation,
-    registerToChannels: Array<ChannelType>
-  ) {
-    const eventEmitter = new TypedEvent<IContact>();
-    const socket = this.createSocket(address);
-    const peers = this.addMyselfToLinkedList(
-      socket,
-      registerToChannels,
-      eventEmitter
-    );
+    const peers = this.addMyselfToLinkedList(socket);
+    const from: IContactInformation = { name, peerId };
     peers.forEach(peer =>
-      peer.on("signal", signalingData =>
-        socket.emit(this.channelName, { signalingData, from })
-      )
+      peer.on("signal", data => socket.emit(this.channelName, { data, from }))
     );
 
-    return eventEmitter;
+    return peerId;
   }
 }
