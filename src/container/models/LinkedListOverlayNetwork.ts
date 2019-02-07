@@ -1,13 +1,14 @@
 import Peer from "simple-peer";
 import { SignalingType } from "./ISignalingData";
-import IOverlayNetwork from "./IOverlayNetwork";
+import IOverlayNetwork, { IConnectionState } from "./IOverlayNetwork";
 import Contact from "./Contact";
 import TypedEvent from "./TypedEvent";
 import { sha256 } from "js-sha256";
 import { IContact } from "./Contact";
-import IChannel, { ChannelType, ChannelState } from "./IChannel";
+import { ChannelState } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
+  public readonly state: TypedEvent<IConnectionState | Error>;
   public readonly rootChannel = new TypedEvent<IContact>();
 
   constructor(
@@ -50,8 +51,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
 
   private signalingPeersOverSocket(
     address: string,
-    { peerId, name }: { peerId: string; name: string },
-    reject: (error: Error) => void
+    { peerId, name }: { peerId: string; name: string }
   ) {
     const socket = this.io(address, {
       transports: ["websocket"],
@@ -65,7 +65,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
       );
       peer.on("error", error => {
         socket.close();
-        reject(error);
+        this.state.emit(error);
       });
     });
 
@@ -73,27 +73,16 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   }
 
   public bootstrap(address: string, name: string) {
-    return new Promise<IChannel>((resolve, reject) => {
-      const peerId = sha256(name);
-      const socket = this.signalingPeersOverSocket(
-        address,
-        { peerId, name },
-        reject
-      );
-      this.rootChannel.once(() =>
-        resolve({
-          channelType: ChannelType.MySelf,
-          name,
-          peerId,
-          state: ChannelState.Ready
-        })
-      );
+    const peerId = sha256(name);
+    const socket = this.signalingPeersOverSocket(address, { peerId, name });
+    this.rootChannel.once(() =>
+      this.state.emit({ name, peerId, state: ChannelState.Ready })
+    );
 
-      setTimeout(() => {
-        console.log("close socket.");
-        reject("connection timeout");
-        socket.close();
-      }, this.connectionTimeOut);
-    });
+    setTimeout(() => {
+      console.log("close socket.");
+      this.state.emit(new Error("connection timeout"));
+      socket.close();
+    }, this.connectionTimeOut);
   }
 }

@@ -1,13 +1,12 @@
 import { Container } from "unstated";
-import IOverlayNetwork from "./models/IOverlayNetwork";
-import IChannel, { ChannelState, ChannelType } from "./models/IChannel";
+import IOverlayNetwork, { IConnectionState } from "./models/IOverlayNetwork";
+import { ChannelState } from "./models/IChannel";
 
-export default class AppContainer extends Container<IChannel> {
+export default class AppContainer extends Container<IConnectionState> {
   state = {
     peerId: "",
     name: "",
-    state: ChannelState.NotConnected,
-    channelType: ChannelType.MySelf
+    state: ChannelState.NotConnected
   };
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
@@ -15,14 +14,15 @@ export default class AppContainer extends Container<IChannel> {
   }
 
   async bootstrap(address: string, name: string) {
-    try {
-      const contactInformation = await this.overlayNetwork.bootstrap(
-        address,
-        name
-      );
-      this.setState(contactInformation);
-    } catch (error) {
-      console.error(error);
-    }
+    this.overlayNetwork.bootstrap(address, name);
+    this.overlayNetwork.state.on(state => {
+      if (state as Error) {
+        console.error(state);
+        this.setState({ state: ChannelState.Error });
+      }
+      if (state as IConnectionState) {
+        this.setState(state);
+      }
+    });
   }
 }

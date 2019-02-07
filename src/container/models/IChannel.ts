@@ -3,8 +3,7 @@ import Peer from "simple-peer";
 export enum ChannelType {
   RootChannel = 1,
   Contactlist = 2,
-  Messages = 4,
-  MySelf = 8
+  Messages = 4
 }
 
 export enum ChannelState {
