@@ -17,7 +17,10 @@ export default class ContactlistContainer extends Container<Channels> {
       channel.peer.on("data", (data: string) => {
         const newPeers: IChannel[] = JSON.parse(data);
         newPeers.forEach(x => {
-          this.state[x.peerId] = this.state[x.peerId] || x;
+          this.state[x.peerId] = this.state[x.peerId] || {
+            ...x,
+            state: ChannelState.NotConnected
+          };
         });
         this.setState(this.state);
       });
@@ -31,8 +34,7 @@ export default class ContactlistContainer extends Container<Channels> {
       .filter(peerId => peerId !== to)
       .map(peerId => ({
         peerId,
-        name: this.state[peerId].name,
-        state: ChannelState.NotConnected
+        name: this.state[peerId].name
       }));
 
     if (newPeers.length !== 0) {
