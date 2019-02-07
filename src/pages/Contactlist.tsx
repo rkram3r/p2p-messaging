@@ -17,7 +17,13 @@ export default () => (
           const { name, state } = container.state.channels[peerId];
           if (state === ChannelState.Ready) {
             return (
-              <Status key={peerId} status={{ name }}>
+              <Status
+                key={peerId}
+                status={{
+                  name,
+                  goToNextState: () => container.sendContactInformatoin(peerId)
+                }}
+              >
                 <ReadyIcon className="float-right text-success" />
               </Status>
             );

@@ -22,7 +22,7 @@ export default class AppContainer extends Container<IChannel> {
       );
       this.setState(contactInformation);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 }

@@ -21,14 +21,18 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     return type === SignalingType.Answer;
   }
 
-  private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
+  private addMyselfToLinkedList(socket: SocketIOClient.Socket, myself: string) {
     const initiator = new Peer({ initiator: true });
     const listener = new Peer();
     socket.on(this.channelName, ({ data, from }) => {
       const peer = this.isInitiator(data.type) ? initiator : listener;
       peer.signal(data);
       peer.on("connect", () => {
-        if (data.type) {
+        if (myself === from.peerId) {
+          socket.close();
+          throw new Error("cannot bootstrap twice!");
+        }
+        if (data.type && myself) {
           this.rootChannel.emit(
             new Contact(
               from.name,
@@ -52,7 +56,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
         transports: ["websocket"],
         secure: true
       });
-      const peers = this.addMyselfToLinkedList(socket);
+      const peers = this.addMyselfToLinkedList(socket, peerId);
       this.rootChannel.once(() =>
         resolve({
           channelType: ChannelType.MySelf,
@@ -61,10 +65,9 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
           state: ChannelState.Ready
         })
       );
-      const from = { name, peerId };
       peers.forEach(peer => {
         peer.on("signal", data =>
-          socket.emit(this.channelName, { data, from })
+          socket.emit(this.channelName, { data, from: { name, peerId } })
         );
         peer.on("error", error => {
           socket.close();
@@ -73,6 +76,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
       });
 
       setTimeout(() => {
+        console.log("close socket.");
         reject("connection timeout");
         socket.close();
       }, this.connectionTimeOut);

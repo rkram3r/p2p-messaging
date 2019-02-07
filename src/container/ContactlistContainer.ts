@@ -28,21 +28,25 @@ export default class ContactlistContainer extends Container<ContactlistState> {
 
         this.setState({ channels: this.state.channels });
       });
-      const { channels } = this.state;
-      const newPeers = Object.keys(channels)
-        .filter(peerId => peerId !== channel.peerId)
-        .map(peerId => ({
-          peerId,
-          name: channels[peerId].name,
-          state: ChannelState.NotConnected
-        }));
-
-      if (newPeers.length !== 0) {
-        const { peer } = channel;
-        peer.send(JSON.stringify(newPeers));
-      }
     });
   }
   connectTo(peerId: string) {}
   setupConnection(peerId: string) {}
+
+  sendContactInformatoin(peerId: string) {
+    const { channels } = this.state;
+    const channel = this.state.channels[peerId];
+    const newPeers = Object.keys(channels)
+      .filter(peerId => peerId !== channel.peerId)
+      .map(peerId => ({
+        peerId,
+        name: channels[peerId].name,
+        state: ChannelState.NotConnected
+      }));
+
+    if (newPeers.length !== 0) {
+      const { peer } = channel;
+      peer.send(JSON.stringify(newPeers));
+    }
+  }
 }
