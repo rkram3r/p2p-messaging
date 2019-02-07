@@ -2,12 +2,15 @@ import Peer from "simple-peer";
 import IChannel, { ChannelState, ChannelType } from "./IChannel";
 import TypedEvent from "./TypedEvent";
 import ISignalingData from "./ISignalingData";
-import IContact from "./IContact";
 
 type SignalExchange = {
   signalingData: ISignalingData;
   channelType: ChannelType;
 };
+
+export interface IContact extends IChannel {
+  createNewChannel(type: ChannelType): Promise<IChannel>;
+}
 
 export default class Contact implements IContact {
   public readonly channelType = ChannelType.RootChannel;

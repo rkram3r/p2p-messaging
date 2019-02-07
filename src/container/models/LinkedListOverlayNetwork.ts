@@ -4,7 +4,7 @@ import IOverlayNetwork from "./IOverlayNetwork";
 import Contact from "./Contact";
 import TypedEvent from "./TypedEvent";
 import { sha256 } from "js-sha256";
-import IContact from "./IContact";
+import { IContact } from "./Contact";
 import IChannel, { ChannelType, ChannelState } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
@@ -32,7 +32,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
           socket.close();
           throw new Error("cannot bootstrap twice!");
         }
-        if (data.type && myself) {
+        if (data.type) {
           this.rootChannel.emit(
             new Contact(
               from.name,
@@ -49,14 +49,38 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     return [initiator, listener];
   }
 
+  private signalingPeersOverSocket(
+    address: string,
+    { peerId, name }: { peerId: string; name: string },
+    reject: (error: Error) => void
+  ) {
+    const socket = this.io(address, {
+      transports: ["websocket"],
+      secure: true
+    });
+    const peers = this.addMyselfToLinkedList(socket, peerId);
+
+    peers.forEach(peer => {
+      peer.on("signal", data =>
+        socket.emit(this.channelName, { data, from: { name, peerId } })
+      );
+      peer.on("error", error => {
+        socket.close();
+        reject(error);
+      });
+    });
+
+    return socket;
+  }
+
   public bootstrap(address: string, name: string) {
     return new Promise<IChannel>((resolve, reject) => {
       const peerId = sha256(name);
-      const socket = this.io(address, {
-        transports: ["websocket"],
-        secure: true
-      });
-      const peers = this.addMyselfToLinkedList(socket, peerId);
+      const socket = this.signalingPeersOverSocket(
+        address,
+        { peerId, name },
+        reject
+      );
       this.rootChannel.once(() =>
         resolve({
           channelType: ChannelType.MySelf,
@@ -65,15 +89,6 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
           state: ChannelState.Ready
         })
       );
-      peers.forEach(peer => {
-        peer.on("signal", data =>
-          socket.emit(this.channelName, { data, from: { name, peerId } })
-        );
-        peer.on("error", error => {
-          socket.close();
-          reject(error);
-        });
-      });
 
       setTimeout(() => {
         console.log("close socket.");

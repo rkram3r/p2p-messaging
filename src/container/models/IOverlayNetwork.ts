@@ -1,5 +1,5 @@
 import TypedEvent from "./TypedEvent";
-import IContact from "./IContact";
+import { IContact } from "./Contact";
 import IChannel from "./IChannel";
 
 export default interface IOverlayNetwork {
