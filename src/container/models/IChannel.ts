@@ -3,7 +3,8 @@ import Peer from "simple-peer";
 export enum ChannelType {
   RootChannel = 1,
   Contactlist = 2,
-  Messages = 4
+  Messages = 4,
+  MySelf = 8
 }
 
 export enum ChannelState {
@@ -15,8 +16,9 @@ export enum ChannelState {
 }
 
 export default interface IChannel {
-  peer: Peer.Instance;
+  peer?: Peer.Instance;
   peerId: string;
+  name: string;
   state: ChannelState;
   channelType: ChannelType;
 }

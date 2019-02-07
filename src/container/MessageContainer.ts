@@ -22,9 +22,7 @@ export default class MessageContainer extends Container<State> {
     super();
     this.overlayNetwork.rootChannel.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Messages);
-      this.state.channels[contact.peerId] = {
-        [ChannelType.Messages]: channel
-      };
+      this.state.channels[contact.peerId] = channel;
       channel.peer.on("data", newMessages => {
         const message = { ...JSON.parse(newMessages), from: channel.peerId };
         this.setState({
@@ -41,7 +39,7 @@ export default class MessageContainer extends Container<State> {
     const id = sha256(message + `${timeStamp}`);
     const newMessage = { id, message, timeStamp };
     Object.keys(this.state.channels).forEach(to => {
-      const { peer } = this.state.channels[to][ChannelType.Messages];
+      const { peer } = this.state.channels[to];
       peer.send(JSON.stringify({ ...newMessage, to }));
     });
     this.setState({

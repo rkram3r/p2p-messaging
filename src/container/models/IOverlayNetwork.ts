@@ -1,8 +1,8 @@
 import TypedEvent from "./TypedEvent";
 import IContact from "./IContact";
-import IContactInformation from "./IContactInformation";
+import IChannel from "./IChannel";
 
 export default interface IOverlayNetwork {
-  bootstrap(address: string, name: string): Promise<IContactInformation>;
+  bootstrap(address: string, name: string): Promise<IChannel>;
   rootChannel: TypedEvent<IContact>;
 }

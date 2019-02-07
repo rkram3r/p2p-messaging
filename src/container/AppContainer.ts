@@ -1,11 +1,13 @@
 import { Container } from "unstated";
 import IOverlayNetwork from "./models/IOverlayNetwork";
-import IContactInformation from "./models/IContactInformation";
+import IChannel, { ChannelState, ChannelType } from "./models/IChannel";
 
-export default class AppContainer extends Container<IContactInformation> {
+export default class AppContainer extends Container<IChannel> {
   state = {
     peerId: "",
-    name: ""
+    name: "",
+    state: ChannelState.NotConnected,
+    channelType: ChannelType.MySelf
   };
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {

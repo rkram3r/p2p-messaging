@@ -1,6 +1,5 @@
 import IChannel, { ChannelType } from "./IChannel";
-import IContactInformation from "./IContactInformation";
 
-export default interface IContact extends IContactInformation {
+export default interface IContact extends IChannel {
   createNewChannel(type: ChannelType): Promise<IChannel>;
 }

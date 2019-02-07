@@ -13,8 +13,8 @@ export default () => (
   <Subscribe to={[ContactlistContainer]}>
     {(container: ContactlistContainer) => (
       <div className="shadow-sm col-sm-4 col-lg-3 py-2">
-        {Object.keys(container.state.contactlist).map(key => {
-          const { peerId, name, state } = container.state.contactlist[key];
+        {Object.keys(container.state.channels).map(peerId => {
+          const { name, state } = container.state.channels[peerId];
           if (state === ChannelState.Ready) {
             return (
               <Status key={peerId} status={{ name }}>

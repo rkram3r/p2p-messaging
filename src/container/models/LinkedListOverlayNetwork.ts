@@ -1,27 +1,21 @@
 import Peer from "simple-peer";
-import { ChannelType } from "./IChannel";
-import ISignalingData, { SignalingType } from "./ISignalingData";
+import { SignalingType } from "./ISignalingData";
 import IOverlayNetwork from "./IOverlayNetwork";
 import Contact from "./Contact";
 import TypedEvent from "./TypedEvent";
 import { sha256 } from "js-sha256";
 import IContact from "./IContact";
-import IContactInformation from "./IContactInformation";
-
-type Exchange = {
-  from: IContactInformation;
-  data: ISignalingData;
-};
+import IChannel, { ChannelType, ChannelState } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   public readonly rootChannel = new TypedEvent<IContact>();
 
   private readonly channelName: string = "p2p-connect";
-  private io: SocketIOClientStatic;
 
-  constructor(io: SocketIOClientStatic) {
-    this.io = io;
-  }
+  constructor(
+    private readonly io: SocketIOClientStatic,
+    private readonly connectionTimeOut: number
+  ) {}
 
   private isInitiator(type: SignalingType) {
     return type === SignalingType.Answer;
@@ -30,7 +24,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
     const initiator = new Peer({ initiator: true });
     const listener = new Peer();
-    socket.on(this.channelName, ({ data, from }: Exchange) => {
+    socket.on(this.channelName, ({ data, from }) => {
       const peer = this.isInitiator(data.type) ? initiator : listener;
       peer.signal(data);
       peer.on("connect", () => {
@@ -52,15 +46,22 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   }
 
   public bootstrap(address: string, name: string) {
-    return new Promise<IContactInformation>((resolve, reject) => {
+    return new Promise<IChannel>((resolve, reject) => {
       const peerId = sha256(name);
       const socket = this.io(address, {
         transports: ["websocket"],
         secure: true
       });
       const peers = this.addMyselfToLinkedList(socket);
-      this.rootChannel.once(x => resolve(x));
-      const from: IContactInformation = { name, peerId };
+      this.rootChannel.once(() =>
+        resolve({
+          channelType: ChannelType.MySelf,
+          name,
+          peerId,
+          state: ChannelState.Ready
+        })
+      );
+      const from = { name, peerId };
       peers.forEach(peer => {
         peer.on("signal", data =>
           socket.emit(this.channelName, { data, from })
@@ -70,6 +71,11 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
           reject(error);
         });
       });
+
+      setTimeout(() => {
+        reject("connection timeout");
+        socket.close();
+      }, this.connectionTimeOut);
     });
   }
 }

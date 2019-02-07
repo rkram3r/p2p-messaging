@@ -10,6 +10,7 @@ type SignalExchange = {
 };
 
 export default class Contact implements IContact {
+  public readonly channelType = ChannelType.RootChannel;
   public readonly state = ChannelState.Ready;
   private readonly channelEvent = new TypedEvent<SignalExchange>();
 
@@ -39,6 +40,7 @@ export default class Contact implements IContact {
           peer,
           state: ChannelState.Ready,
           peerId: this.peerId,
+          name: this.name,
           channelType: type
         })
       );

@@ -1,21 +1,14 @@
 import { Container } from "unstated";
-import { ChannelType } from "./models/IChannel";
+import IChannel, { ChannelType, ChannelState } from "./models/IChannel";
 import IOverlayNetwork from "./models/IOverlayNetwork";
-import IContactInformation from "./models/IContactInformation";
 import Channels from "./models/Channels";
 
-class Contactlist {
-  [peerId: string]: IContactInformation;
-}
-
 type ContactlistState = {
-  contactlist: Contactlist;
   channels: Channels;
 };
 
-export default class AppContainer extends Container<ContactlistState> {
+export default class ContactlistContainer extends Container<ContactlistState> {
   state = {
-    contactlist: new Contactlist(),
     channels: new Channels()
   };
 
@@ -24,33 +17,24 @@ export default class AppContainer extends Container<ContactlistState> {
 
     this.overlayNetwork.rootChannel.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
-      this.state.channels[contact.peerId] = {
-        [ChannelType.Contactlist]: channel
-      };
-
-      this.state.contactlist[contact.peerId] = contact;
-      this.setState({
-        channels: this.state.channels,
-        contactlist: this.state.contactlist
-      });
+      this.state.channels[contact.peerId] = channel;
+      this.setState({ channels: this.state.channels });
 
       channel.peer.on("data", (data: string) => {
-        const newPeers: IContactInformation[] = JSON.parse(data);
+        const newPeers: IChannel[] = JSON.parse(data);
         newPeers.forEach(x => {
-          const contact = this.state.contactlist[x.peerId] || x;
-          this.state.contactlist[x.peerId] = contact;
+          this.state.channels[x.peerId] = this.state.channels[x.peerId] || x;
         });
 
-        this.setState({
-          contactlist: this.state.contactlist
-        });
+        this.setState({ channels: this.state.channels });
       });
-      const { contactlist } = this.state;
-      const newPeers = Object.keys(contactlist)
+      const { channels } = this.state;
+      const newPeers = Object.keys(channels)
         .filter(peerId => peerId !== channel.peerId)
-        .map(x => ({
-          peerId: this.state.contactlist[x].peerId,
-          name: this.state.contactlist[x].name
+        .map(peerId => ({
+          peerId,
+          name: channels[peerId].name,
+          state: ChannelState.NotConnected
         }));
 
       if (newPeers.length !== 0) {

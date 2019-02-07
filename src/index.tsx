@@ -9,7 +9,7 @@ import AppContainer from "./container/AppContainer";
 import MessageContainer from "./container/MessageContainer";
 import ContactlistContainer from "./container/ContactlistContainer";
 
-const linkexListOverlayNetwork = new LinkedListOverlayNetwork(io);
+const linkexListOverlayNetwork = new LinkedListOverlayNetwork(io, 3000);
 const appContainer = new AppContainer(linkexListOverlayNetwork);
 const messageContainer = new MessageContainer(linkexListOverlayNetwork);
 const contactlistContainer = new ContactlistContainer(linkexListOverlayNetwork);
