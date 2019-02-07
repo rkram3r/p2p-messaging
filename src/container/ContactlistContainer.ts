@@ -3,49 +3,40 @@ import IChannel, { ChannelType, ChannelState } from "./models/IChannel";
 import IOverlayNetwork from "./models/IOverlayNetwork";
 import Channels from "./models/Channels";
 
-type ContactlistState = {
-  channels: Channels;
-};
-
-export default class ContactlistContainer extends Container<ContactlistState> {
-  state = {
-    channels: new Channels()
-  };
+export default class ContactlistContainer extends Container<Channels> {
+  state = {};
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
 
     this.overlayNetwork.rootChannel.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
-      this.state.channels[contact.peerId] = channel;
-      this.setState({ channels: this.state.channels });
+      this.state[contact.peerId] = channel;
+      this.setState(this.state);
 
       channel.peer.on("data", (data: string) => {
         const newPeers: IChannel[] = JSON.parse(data);
         newPeers.forEach(x => {
-          this.state.channels[x.peerId] = this.state.channels[x.peerId] || x;
+          this.state[x.peerId] = this.state[x.peerId] || x;
         });
-
-        this.setState({ channels: this.state.channels });
+        this.setState(this.state);
       });
     });
   }
   connectTo(peerId: string) {}
   setupConnection(peerId: string) {}
 
-  sendContactInformatoin(peerId: string) {
-    const { channels } = this.state;
-    const channel = this.state.channels[peerId];
-    const newPeers = Object.keys(channels)
-      .filter(peerId => peerId !== channel.peerId)
+  sendContactInformatoin(to: string) {
+    const newPeers = Object.keys(this.state)
+      .filter(peerId => peerId !== to)
       .map(peerId => ({
         peerId,
-        name: channels[peerId].name,
+        name: this.state[peerId].name,
         state: ChannelState.NotConnected
       }));
 
     if (newPeers.length !== 0) {
-      const { peer } = channel;
+      const { peer } = this.state[to];
       peer.send(JSON.stringify(newPeers));
     }
   }
