@@ -5,7 +5,7 @@ import AskToConnectIcon from "react-feather/dist/icons/help-circle";
 import NotConnectedIcon from "react-feather/dist/icons/x-circle";
 import ConnectingIcon from "react-feather/dist/icons/arrow-right-circle";
 
-import Status from "./Status";
+import Status from "./States";
 import ContactlistContainer from "../container/ContactlistContainer";
 import { ChannelState } from "../container/models/IChannel";
 

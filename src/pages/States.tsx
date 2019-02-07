@@ -1,11 +1,11 @@
 import * as React from "react";
 
-interface IStatus {
+interface IState {
   goToNextState?: () => void;
   name: string;
 }
 
-export default (props: { status: IStatus; children: React.ReactNode }) => {
+export default (props: { status: IState; children: React.ReactNode }) => {
   const {
     status: { name },
     children

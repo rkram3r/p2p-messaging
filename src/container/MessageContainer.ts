@@ -20,26 +20,19 @@ export default class MessageContainer extends Container<State> {
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
-    this.overlayNetwork.channels.on(channel => {
-      if (!this.state.channels[channel.peerId]) {
-        this.state.channels[channel.peerId] = {};
-      }
-      this.state.channels[channel.peerId][channel.channelType] = channel;
-      this.setState({ channels: this.state.channels });
-    });
-
-    this.overlayNetwork.channels.on(channel => {
-      if (channel.channelType === ChannelType.Messages) {
-        channel.peer.on("data", newMessages => {
-          const message = { ...JSON.parse(newMessages), from: channel.peerId };
-          this.setState({
-            messages: [...this.state.messages, message]
-          });
+    this.overlayNetwork.rootChannel.on(async contact => {
+      const channel = await contact.createNewChannel(ChannelType.Messages);
+      this.state.channels[contact.peerId] = {
+        [ChannelType.Messages]: channel
+      };
+      channel.peer.on("data", newMessages => {
+        const message = { ...JSON.parse(newMessages), from: channel.peerId };
+        this.setState({
+          messages: [...this.state.messages, message]
         });
-      }
-    });
-    this.overlayNetwork.rootChannel.on(contact => {
-      this.overlayNetwork.createNewChannel(contact, ChannelType.Messages);
+      });
+
+      this.setState({ channels: this.state.channels });
     });
   }
 
@@ -49,14 +42,15 @@ export default class MessageContainer extends Container<State> {
     const newMessage = { id, message, timeStamp };
     Object.keys(this.state.channels).forEach(to => {
       const { peer } = this.state.channels[to][ChannelType.Messages];
-      peer.send(JSON.stringify({ newMessage }));
+      peer.send(JSON.stringify({ ...newMessage, to }));
+    });
+    this.setState({
+      message: "",
+      messages: [...this.state.messages, newMessage]
     });
   }
 
   onMessageChange(message: string) {
     this.setState({ message });
-  }
-  cleanInput() {
-    this.setState({ message: "" });
   }
 }

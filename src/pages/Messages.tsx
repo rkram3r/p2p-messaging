@@ -7,7 +7,7 @@ import AppContainer from "../container/AppContainer";
 
 export default () => (
   <Subscribe to={[MessageContainer, AppContainer]}>
-    {(messageContainer: MessageContainer, appContainer: AppContainer) => (
+    {(messageContainer: MessageContainer) => (
       <div className="col-sm-7 col-lg-8">
         {messageContainer.state.messages
           .sort((a, b) => a.timeStamp - b.timeStamp)
@@ -15,7 +15,7 @@ export default () => (
             <div
               key={id}
               className={`my-2 speech-bubble-${
-                from === appContainer.state.myId ? "me" : "other"
+                from === undefined ? "me" : "other"
               }`}
             >
               <span className="speech-bubble-name">{name}</span>

@@ -1,11 +1,10 @@
 import * as React from "react";
 import { Subscribe } from "unstated";
-import AppContainer from "../container/AppContainer";
 import MessageContainer from "../container/MessageContainer";
 
 export default () => (
-  <Subscribe to={[MessageContainer, AppContainer]}>
-    {(messageContainer: MessageContainer, appContainer: AppContainer) => (
+  <Subscribe to={[MessageContainer]}>
+    {(messageContainer: MessageContainer) => (
       <div className="form-group row shadow-sm py-3">
         <div className="col-sm-8 col-lg-10">
           <input
@@ -21,10 +20,9 @@ export default () => (
           <button
             type="submit"
             className="float-right btn btn-block btn-primary"
-            onClick={() => {
-              appContainer.send(messageContainer.state.message);
-              messageContainer.cleanInput();
-            }}
+            onClick={() =>
+              messageContainer.send(messageContainer.state.message)
+            }
           >
             Send
           </button>

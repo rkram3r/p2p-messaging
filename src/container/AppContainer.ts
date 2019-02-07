@@ -1,14 +1,10 @@
 import { Container } from "unstated";
 import IOverlayNetwork from "./models/IOverlayNetwork";
+import IContactInformation from "./models/IContactInformation";
 
-export type AppState = {
-  myId: string;
-  name: string;
-};
-
-export default class AppContainer extends Container<AppState> {
+export default class AppContainer extends Container<IContactInformation> {
   state = {
-    myId: "",
+    peerId: "",
     name: ""
   };
 
@@ -16,8 +12,15 @@ export default class AppContainer extends Container<AppState> {
     super();
   }
 
-  bootstrap(address: string, name: string) {
-    const id = this.overlayNetwork.bootstrap(address, name);
-    this.setState({ myId: id, name });
+  async bootstrap(address: string, name: string) {
+    try {
+      const contactInformation = await this.overlayNetwork.bootstrap(
+        address,
+        name
+      );
+      this.setState(contactInformation);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
