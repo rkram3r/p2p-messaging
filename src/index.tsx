@@ -6,12 +6,16 @@ import LinkedListOverlayNetwork from "./container/models/LinkedListOverlayNetwor
 import "./variables.scss";
 import Router from "./Router";
 import AppContainer from "./container/AppContainer";
+import MessageContainer from "./container/MessageContainer";
+import ContactlistContainer from "./container/ContactlistContainer";
 
 const linkexListOverlayNetwork = new LinkedListOverlayNetwork(io);
 const appContainer = new AppContainer(linkexListOverlayNetwork);
+const messageContainer = new MessageContainer(linkexListOverlayNetwork);
+const contactlistContainer = new ContactlistContainer(linkexListOverlayNetwork);
 
 ReactDOM.render(
-  <Provider inject={[appContainer]}>
+  <Provider inject={[appContainer, messageContainer, contactlistContainer]}>
     <Router />
   </Provider>,
   document.getElementById("root")

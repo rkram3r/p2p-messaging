@@ -6,13 +6,13 @@ import NotConnectedIcon from "react-feather/dist/icons/x-circle";
 import ConnectingIcon from "react-feather/dist/icons/arrow-right-circle";
 
 import Status from "./Status";
-import AppContainer from "../container/AppContainer";
+import ContactlistContainer from "../container/ContactlistContainer";
 import { ChannelState } from "../container/models/IChannel";
 
 export default () => (
-  <Subscribe to={[AppContainer]}>
-    {(container: AppContainer) => (
-      <div className="shadow-sm col-sm-4 col-lg-2 py-2">
+  <Subscribe to={[ContactlistContainer]}>
+    {(container: ContactlistContainer) => (
+      <div className="shadow-sm col-sm-4 col-lg-3 py-2">
         {Object.keys(container.state.contactlist).map(key => {
           const { peerId, name, state } = container.state.contactlist[key];
           if (state === ChannelState.Ready) {

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Subscribe } from "unstated";
 
-import AppContainer from "../container/AppContainer";
+import ContactlistContainer from "../container/ContactlistContainer";
 import Header from "./Header";
 import Connection from "./Connection";
 import Contactlist from "./Contactlist";
@@ -10,18 +10,22 @@ import Messages from "./Messages";
 
 export default () => {
   return (
-    <Subscribe to={[AppContainer]}>
-      {(container: AppContainer) => (
+    <Subscribe to={[ContactlistContainer]}>
+      {(container: ContactlistContainer) => (
         <section>
           <Header />
           <main role="main" className="container">
             <Connection />
             <div className="row">
-              {container.state.contactlist.size !== 0 && <Contactlist />}
+              {Object.keys(container.state.contactlist).length !== 0 && (
+                <Contactlist />
+              )}
               <div className="col-sm-1 col-lg-1" />
               <Messages />
             </div>
-            {container.state.contactlist.size !== 0 && <CreateMessage />}
+            {Object.keys(container.state.contactlist).length !== 0 && (
+              <CreateMessage />
+            )}
           </main>
         </section>
       )}
