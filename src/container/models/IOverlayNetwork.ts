@@ -11,5 +11,5 @@ export interface IConnectionState {
 export default interface IOverlayNetwork {
   bootstrap(address: string, name: string): void;
   rootChannel: TypedEvent<IContact>;
-  state: TypedEvent<IConnectionState | Error>;
+  overlayNetworkState: TypedEvent<IConnectionState | Error>;
 }

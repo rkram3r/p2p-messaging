@@ -15,12 +15,11 @@ export default class AppContainer extends Container<IConnectionState> {
 
   async bootstrap(address: string, name: string) {
     this.overlayNetwork.bootstrap(address, name);
-    this.overlayNetwork.state.on(state => {
-      if (state as Error) {
+    this.overlayNetwork.overlayNetworkState.on(state => {
+      if (state instanceof Error) {
         console.error(state);
         this.setState({ state: ChannelState.Error });
-      }
-      if (state as IConnectionState) {
+      } else {
         this.setState(state);
       }
     });

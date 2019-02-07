@@ -8,7 +8,9 @@ import { IContact } from "./Contact";
 import { ChannelState } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
-  public readonly state: TypedEvent<IConnectionState | Error>;
+  public readonly overlayNetworkState = new TypedEvent<
+    IConnectionState | Error
+  >();
   public readonly rootChannel = new TypedEvent<IContact>();
 
   constructor(
@@ -65,7 +67,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
       );
       peer.on("error", error => {
         socket.close();
-        this.state.emit(error);
+        this.overlayNetworkState.emit(error);
       });
     });
 
@@ -73,16 +75,21 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   }
 
   public bootstrap(address: string, name: string) {
-    const peerId = sha256(name);
-    const socket = this.signalingPeersOverSocket(address, { peerId, name });
-    this.rootChannel.once(() =>
-      this.state.emit({ name, peerId, state: ChannelState.Ready })
-    );
-
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       console.log("close socket.");
-      this.state.emit(new Error("connection timeout"));
+      this.overlayNetworkState.emit(new Error("connection timeout"));
       socket.close();
     }, this.connectionTimeOut);
+
+    const peerId = sha256(name);
+    const socket = this.signalingPeersOverSocket(address, { peerId, name });
+    this.rootChannel.once(() => {
+      this.overlayNetworkState.emit({
+        name,
+        peerId,
+        state: ChannelState.Ready
+      });
+      clearTimeout(timeout);
+    });
   }
 }
