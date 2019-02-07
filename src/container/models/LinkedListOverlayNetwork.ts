@@ -10,11 +10,10 @@ import IChannel, { ChannelType, ChannelState } from "./IChannel";
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   public readonly rootChannel = new TypedEvent<IContact>();
 
-  private readonly channelName: string = "p2p-connect";
-
   constructor(
     private readonly io: SocketIOClientStatic,
-    private readonly connectionTimeOut: number
+    private readonly connectionTimeOut: number,
+    private readonly channelName: string = "p2p-connect"
   ) {}
 
   private isInitiator(type: SignalingType) {

@@ -1,5 +1,10 @@
-import Listener from "./Listener";
-import Disposable from "./Disposable";
+interface Listener<T> {
+  (event: T): any;
+}
+
+interface Disposable {
+  dispose(): void;
+}
 
 export default class TypedEvent<T> {
   private listeners: Listener<T>[] = [];

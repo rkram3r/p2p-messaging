@@ -14,9 +14,7 @@ export default () => (
           .map(({ from, id, message }) => (
             <div
               key={id}
-              className={`my-2 speech-bubble-${
-                from === undefined ? "me" : "other"
-              }`}
+              className={`my-2 speech-bubble-${from ? "me" : "other"}`}
             >
               <span className="speech-bubble-name">{name}</span>
               {message}
