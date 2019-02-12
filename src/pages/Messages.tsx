@@ -8,7 +8,7 @@ import AppContainer from "../container/AppContainer";
 export default () => (
   <Subscribe to={[MessageContainer, AppContainer]}>
     {(messageContainer: MessageContainer) => (
-      <div className="col-sm-7 col-lg-8">
+      <div className="col-sm-7 col-md-7 col-lg-7">
         {messageContainer.state.messages
           .sort((a, b) => a.timeStamp - b.timeStamp)
           .map(({ from, id, message }) => (

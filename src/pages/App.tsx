@@ -14,11 +14,10 @@ export default () => {
       {(container: ContactlistContainer) => (
         <section>
           <Header />
-          <main role="main" className="container">
+          <main role="main" className="container-fluid">
             <Connection />
             <div className="row">
               {Object.keys(container.state).length !== 0 && <Contactlist />}
-              <div className="col-sm-1 col-lg-1" />
               <Messages />
             </div>
             {Object.keys(container.state).length !== 0 && <CreateMessage />}

@@ -70,7 +70,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     return socket;
   }
   private setContactInfos(name: string) {
-    const peerId = sha256(name);
+    const peerId = sha256(name + new Date().getTime());
     this.peerId = peerId;
     this.name = name;
   }
