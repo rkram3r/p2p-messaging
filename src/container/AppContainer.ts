@@ -1,8 +1,14 @@
 import { Container } from "unstated";
-import IOverlayNetwork, { IConnectionState } from "./models/IOverlayNetwork";
+import IOverlayNetwork from "./models/IOverlayNetwork";
 import { ChannelState } from "./models/IChannel";
 
-export default class AppContainer extends Container<IConnectionState> {
+type AppState = {
+  peerId: string;
+  name: string;
+  state: ChannelState;
+};
+
+export default class AppContainer extends Container<AppState> {
   state = {
     peerId: "",
     name: "",
@@ -11,17 +17,10 @@ export default class AppContainer extends Container<IConnectionState> {
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
+    overlayNetwork.networkState.on(state => this.setState({ state }));
   }
 
-  async bootstrap(address: string, name: string) {
+  bootstrap(address: string, name: string) {
     this.overlayNetwork.bootstrap(address, name);
-    this.overlayNetwork.overlayNetworkState.on(state => {
-      if (state instanceof Error) {
-        console.error(state);
-        this.setState({ state: ChannelState.Error });
-      } else {
-        this.setState(state);
-      }
-    });
   }
 }
