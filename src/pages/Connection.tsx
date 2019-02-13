@@ -18,6 +18,7 @@ export default () => (
         </div>
         <div className="col-sm-4 col-lg-2">
           <button
+            autoFocus={container.state.autoFocus}
             type="submit"
             className="float-right btn btn-block btn-primary"
             onClick={() => container.bootstrap()}

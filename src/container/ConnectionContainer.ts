@@ -5,13 +5,15 @@ type State = {
   address: string;
   myName: string;
   connection: string;
+  autoFocus: boolean;
 };
 
 export default class ConnectionContainer extends Container<State> {
   state = {
     address: "",
     myName: "",
-    connection: ""
+    connection: "",
+    autoFocus: true
   };
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
@@ -19,7 +21,12 @@ export default class ConnectionContainer extends Container<State> {
     const address = "localhost:3030";
     const connection = `${myName}@${address}`;
     this.setState({ connection, myName, address });
+
+    overlayNetwork.networkState.once(() => {
+      this.setState({ autoFocus: false });
+    });
   }
+
   connectionChange(connection: string) {
     const [myName, address] = connection.split("@");
     this.setState({ address, myName, connection });

@@ -10,13 +10,15 @@ type State = {
     [id: string]: IChannel;
   };
   messages: Array<IMessage>;
+  autoFocus: boolean;
 };
 
 export default class MessageContainer extends Container<State> {
   state = {
     message: "",
     channels: {},
-    messages: new Array<IMessage>()
+    messages: new Array<IMessage>(),
+    autoFocus: false
   };
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
@@ -26,6 +28,9 @@ export default class MessageContainer extends Container<State> {
       this.state.channels[contact.peerId] = channel;
       this.setState({ channels: this.state.channels });
       this.listenOnNewMessages(channel);
+    });
+    overlayNetwork.networkState.once(() => {
+      this.setState({ autoFocus: true });
     });
   }
 
@@ -37,17 +42,19 @@ export default class MessageContainer extends Container<State> {
   }
 
   send() {
-    const timeStamp = new Date().getTime();
-    const id = sha256(this.state.message + `${timeStamp}`);
-    const newMessage = { id, message: this.state.message, timeStamp };
-    Object.keys(this.state.channels).forEach(to => {
-      const { peer } = this.state.channels[to];
-      peer.send(JSON.stringify({ ...newMessage, to }));
-    });
-    this.setState({
-      message: "",
-      messages: [...this.state.messages, newMessage]
-    });
+    if (this.state.message.length !== 0) {
+      const timeStamp = new Date().getTime();
+      const id = sha256(this.state.message + `${timeStamp}`);
+      const newMessage = { id, message: this.state.message, timeStamp };
+      Object.keys(this.state.channels).forEach(to => {
+        const { peer } = this.state.channels[to];
+        peer.send(JSON.stringify({ ...newMessage, to }));
+      });
+      this.setState({
+        message: "",
+        messages: [...this.state.messages, newMessage]
+      });
+    }
   }
 
   onMessageChange(message: string) {

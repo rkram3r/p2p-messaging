@@ -5,7 +5,10 @@ import MessageContainer from "../container/MessageContainer";
 export default () => (
   <Subscribe to={[MessageContainer]}>
     {(messageContainer: MessageContainer) => (
-      <div className="form-group row shadow-sm py-3">
+      <form
+        className="form-group row shadow-sm py-3"
+        onSubmit={event => event.preventDefault()}
+      >
         <div className="col-sm-8 col-lg-10">
           <input
             className="form-control"
@@ -14,6 +17,7 @@ export default () => (
             onChange={({ target: { value } }) =>
               messageContainer.onMessageChange(value)
             }
+            autoFocus={messageContainer.state.autoFocus}
           />
         </div>
         <div className="col-sm-4 col-lg-2">
@@ -25,7 +29,7 @@ export default () => (
             Send
           </button>
         </div>
-      </div>
+      </form>
     )}
   </Subscribe>
 );

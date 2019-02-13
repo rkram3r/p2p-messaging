@@ -18,7 +18,10 @@ const stateMap = new Map<ChannelState, JSX.Element>([
   ],
   [ChannelState.Connecting, <FontAwesomeIcon icon={faChevronCircleRight} />],
   [ChannelState.AskToConnect, <FontAwesomeIcon icon={faQuestionCircle} />],
-  [ChannelState.NotConnected, <FontAwesomeIcon icon={faTimesCircle} />]
+  [
+    ChannelState.NotConnected,
+    <FontAwesomeIcon className="text-danger" icon={faTimesCircle} />
+  ]
 ]);
 
 const State = ({
@@ -46,10 +49,10 @@ const State = ({
 export default () => (
   <Subscribe to={[ContactlistContainer]}>
     {(container: ContactlistContainer) => (
-      <div className="shadow-sm py-2">
+      <div className="shadow-sm py-2 col-sm-5 col-md-5 col-lg-5">
         {container.contacts.map(({ name, state, peerId }) => (
           <State key={peerId} state={{ name }}>
-            <span>{stateMap.get(state)}</span>
+            <span className="px-1">{stateMap.get(state)}</span>
           </State>
         ))}
       </div>
