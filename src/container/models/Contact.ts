@@ -1,5 +1,5 @@
 import Peer from "simple-peer";
-import IChannel, { ChannelType } from "./IChannel";
+import IChannel, { ChannelType, IContact } from "./IChannel";
 import TypedEvent from "./TypedEvent";
 import ISignalingData from "./ISignalingData";
 
@@ -7,10 +7,6 @@ type SignalExchange = {
   signalingData: ISignalingData;
   channelType: ChannelType;
 };
-
-export interface IContact extends IChannel {
-  createNewChannel(type: ChannelType): Promise<IChannel>;
-}
 
 export default class Contact implements IContact {
   private readonly channelEvent = new TypedEvent<SignalExchange>();

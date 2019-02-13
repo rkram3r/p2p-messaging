@@ -1,6 +1,5 @@
 import TypedEvent from "./TypedEvent";
-import { IContact } from "./Contact";
-import { ChannelState } from "./IChannel";
+import { ChannelState, IContact } from "./IChannel";
 
 export default interface IOverlayNetwork {
   bootstrap(address: string, name: string): void;

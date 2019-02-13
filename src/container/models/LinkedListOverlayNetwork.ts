@@ -4,8 +4,7 @@ import IOverlayNetwork from "./IOverlayNetwork";
 import Contact from "./Contact";
 import TypedEvent from "./TypedEvent";
 import { sha256 } from "js-sha256";
-import { IContact } from "./Contact";
-import { ChannelState } from "./IChannel";
+import { ChannelState, IContact } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   public peerId: string;

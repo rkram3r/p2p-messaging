@@ -14,6 +14,10 @@ export enum ChannelState {
   Error
 }
 
+export interface IContact extends IChannel {
+  createNewChannel(type: ChannelType): Promise<IChannel>;
+}
+
 export default interface IChannel {
   peer?: Peer.Instance;
   peerId: string;
