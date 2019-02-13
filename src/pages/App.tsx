@@ -17,10 +17,10 @@ export default () => {
           <main role="main" className="container-fluid">
             <Connection />
             <div className="row">
-              {Object.keys(container.state).length !== 0 && <Contactlist />}
+              {container.any && <Contactlist />}
               <Messages />
             </div>
-            {Object.keys(container.state).length !== 0 && <CreateMessage />}
+            {container.any && <CreateMessage />}
           </main>
         </section>
       )}

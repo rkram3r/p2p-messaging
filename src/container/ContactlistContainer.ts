@@ -72,4 +72,8 @@ export default class ContactlistContainer extends Container<Contacts> {
   get contacts() {
     return Object.keys(this.state).map(peerId => this.state[peerId]);
   }
+
+  get any() {
+    return this.contacts.length !== 0;
+  }
 }
