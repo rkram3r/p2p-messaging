@@ -49,7 +49,7 @@ const State = ({
 export default () => (
   <Subscribe to={[ContactlistContainer]}>
     {(container: ContactlistContainer) => (
-      <div className="shadow-sm py-2 col-sm-5 col-md-5 col-lg-5">
+      <div className="py-2 col-sm-5 col-md-5 col-lg-5">
         {container.contacts.map(({ name, state, peerId }) => (
           <State key={peerId} state={{ name }}>
             <span className="px-1">{stateMap.get(state)}</span>

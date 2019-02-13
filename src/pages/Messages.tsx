@@ -16,7 +16,6 @@ export default () => (
               key={id}
               className={`my-2 speech-bubble-${from ? "me" : "other"}`}
             >
-              <span className="speech-bubble-name">{name}</span>
               {message}
             </div>
           ))}
