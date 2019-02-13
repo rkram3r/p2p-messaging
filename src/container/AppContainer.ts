@@ -17,6 +17,16 @@ export default class AppContainer extends Container<AppState> {
 
   constructor(overlayNetwork: IOverlayNetwork) {
     super();
-    overlayNetwork.networkState.on(state => this.setState({ state }));
+    overlayNetwork.networkState.on(state => {
+      if (state === ChannelState.Ready) {
+        this.setState({
+          state,
+          name: overlayNetwork.name,
+          peerId: overlayNetwork.peerId
+        });
+      } else {
+        this.setState({ state });
+      }
+    });
   }
 }
