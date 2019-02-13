@@ -6,6 +6,25 @@ type State = {
   connection: string;
 };
 
+export class ConnectionContainer extends Container<State> {
+  state = {
+    address: "",
+    myName: "",
+    connection: ""
+  };
+  constructor() {
+    super();
+    const myName = names[Math.floor(Math.random() * names.length)];
+    const address = "localhost:3030";
+    const connection = `${myName}@${address}`;
+    this.setState({ connection, myName, address });
+  }
+  connectionChange(connection: string) {
+    const [myName, address] = connection.split("@");
+    this.setState({ address, myName, connection });
+  }
+}
+
 const names = [
   "James Bond",
   "Indiana Jones",
@@ -35,22 +54,3 @@ const names = [
   "Atticus Finch",
   "Marty McFly"
 ];
-
-export class ConnectionContainer extends Container<State> {
-  state = {
-    address: "",
-    myName: "",
-    connection: ""
-  };
-  constructor() {
-    super();
-    const myName = names[Math.floor(Math.random() * names.length)];
-    const address = "localhost:3030";
-    const connection = `${myName}@${address}`;
-    this.setState({ connection, myName, address });
-  }
-  connectionChange(connection: string) {
-    const [myName, address] = connection.split("@");
-    this.setState({ address, myName, connection });
-  }
-}

@@ -20,9 +20,7 @@ export default () => (
           <button
             type="submit"
             className="float-right btn btn-block btn-primary"
-            onClick={() =>
-              messageContainer.send(messageContainer.state.message)
-            }
+            onClick={() => messageContainer.send()}
           >
             Send
           </button>

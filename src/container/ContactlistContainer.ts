@@ -1,15 +1,21 @@
 import { Container } from "unstated";
+import Peer from "simple-peer";
 import IChannel, { ChannelType, ChannelState } from "./models/IChannel";
 import IOverlayNetwork from "./models/IOverlayNetwork";
-import Channels from "./models/Channels";
 
 type ContactInformation = {
   peerId: string;
   name: string;
   from: string;
+  state?: ChannelState;
+  peer?: Peer.Instance;
 };
 
-export default class ContactlistContainer extends Container<Channels> {
+type Contacts = {
+  [peerId: string]: ContactInformation;
+};
+
+export default class ContactlistContainer extends Container<Contacts> {
   state = {};
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
@@ -17,15 +23,18 @@ export default class ContactlistContainer extends Container<Channels> {
 
     this.overlayNetwork.rootChannel.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
-      this.state[contact.peerId] = channel;
-      this.setState(this.state);
-      this.sendContactinformations();
+      this.state[contact.peerId] = {
+        ...channel,
+        from: this.overlayNetwork.peerId
+      };
+      await this.setState(this.state);
       this.listenForNewContactinformations(channel);
+      this.sendContactinformations();
     });
   }
 
   private listenForNewContactinformations(channel: IChannel) {
-    channel.peer.on("data", (data: string) => {
+    channel.peer.on("data", async (data: string) => {
       const peers: ContactInformation[] = JSON.parse(data);
       const newPeers = peers.filter(
         ({ peerId }) =>
@@ -40,27 +49,27 @@ export default class ContactlistContainer extends Container<Channels> {
           }),
           this.state
         );
-        this.setState(newState);
+        await this.setState(newState);
         this.sendContactinformations();
       }
     });
   }
 
   private sendContactinformations() {
-    const peers = Object.keys(this.state).map(
-      peerId =>
-        ({
-          peerId,
-          name: this.state[peerId].name,
-          from: this.overlayNetwork.peerId
-        } as ContactInformation)
-    );
+    const peers = this.contacts.map(({ name, peerId }) => ({
+      peerId,
+      name,
+      from: this.overlayNetwork.peerId
+    }));
 
-    Object.keys(this.state).forEach(peerId => {
-      const { peer } = this.state[peerId];
-      if (peer) {
-        peer.send(JSON.stringify(peers.filter(({ from }) => from !== peerId)));
-      }
-    });
+    this.contacts
+      .filter(({ peer }) => peer)
+      .forEach(({ peer, peerId }) =>
+        peer.send(JSON.stringify(peers.filter(({ from }) => from !== peerId)))
+      );
+  }
+
+  get contacts() {
+    return Object.keys(this.state).map(peerId => this.state[peerId]);
   }
 }
