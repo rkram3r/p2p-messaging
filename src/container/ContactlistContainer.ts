@@ -25,7 +25,8 @@ export default class ContactlistContainer extends Container<Contacts> {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
       this.state[contact.peerId] = {
         ...channel,
-        from: this.overlayNetwork.peerId
+        from: this.overlayNetwork.peerId,
+        state: ChannelState.Ready
       };
       await this.setState(this.state);
       this.listenForNewContactinformations(channel);

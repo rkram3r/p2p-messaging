@@ -18,6 +18,4 @@ export default interface IChannel {
   peer?: Peer.Instance;
   peerId: string;
   name: string;
-  state: ChannelState;
-  channelType: ChannelType;
 }
