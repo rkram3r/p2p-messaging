@@ -1,18 +1,24 @@
 import * as React from "react";
 import { Subscribe } from "unstated";
-import ReadyIcon from "react-feather/dist/icons/check-circle";
-import AskToConnectIcon from "react-feather/dist/icons/help-circle";
-import NotConnectedIcon from "react-feather/dist/icons/x-circle";
-import ConnectingIcon from "react-feather/dist/icons/arrow-right-circle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCheckCircle,
+  faTimesCircle,
+  faQuestionCircle,
+  faChevronCircleRight
+} from "@fortawesome/free-solid-svg-icons";
 
 import ContactlistContainer from "../container/ContactlistContainer";
 import { ChannelState } from "../container/models/IChannel";
 
 const stateMap = new Map<ChannelState, JSX.Element>([
-  [ChannelState.Ready, <ReadyIcon className="float-right text-success" />],
-  [ChannelState.Connecting, <ConnectingIcon className="float-right" />],
-  [ChannelState.AskToConnect, <AskToConnectIcon className="float-right" />],
-  [ChannelState.NotConnected, <NotConnectedIcon className="float-right" />]
+  [
+    ChannelState.Ready,
+    <FontAwesomeIcon icon={faCheckCircle} className="text-success" />
+  ],
+  [ChannelState.Connecting, <FontAwesomeIcon icon={faChevronCircleRight} />],
+  [ChannelState.AskToConnect, <FontAwesomeIcon icon={faQuestionCircle} />],
+  [ChannelState.NotConnected, <FontAwesomeIcon icon={faTimesCircle} />]
 ]);
 
 const State = ({
@@ -40,10 +46,10 @@ const State = ({
 export default () => (
   <Subscribe to={[ContactlistContainer]}>
     {(container: ContactlistContainer) => (
-      <div className="shadow-sm col-sm-4 col-md-4 col-lg-4 py-2">
+      <div className="shadow-sm py-2">
         {container.contacts.map(({ name, state, peerId }) => (
           <State key={peerId} state={{ name }}>
-            {stateMap.get(state)}
+            <span>{stateMap.get(state)}</span>
           </State>
         ))}
       </div>

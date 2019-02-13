@@ -12,25 +12,25 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   public name: string;
   public readonly networkState = new TypedEvent<ChannelState>();
   public readonly rootChannel = new TypedEvent<IContact>();
+  private readonly channelName: string = "p2p-connect";
 
   constructor(
     private readonly io: SocketIOClientStatic,
-    private readonly connectionTimeOut: number,
-    private readonly channelName: string = "p2p-connect"
+    private readonly connectionTimeOut: number
   ) {}
 
   private isInitiator(type: SignalingType) {
     return type === SignalingType.Answer;
   }
 
-  private addMyselfToLinkedList(socket: SocketIOClient.Socket, myself: string) {
+  private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
     const initiator = new Peer({ initiator: true });
     const listener = new Peer();
     socket.on(this.channelName, ({ data, from }) => {
       const peer = this.isInitiator(data.type) ? initiator : listener;
       peer.signal(data);
       peer.on("connect", () => {
-        if (myself === from.peerId) {
+        if (this.peerId === from.peerId) {
           socket.close();
           throw new Error("cannot bootstrap twice!");
         }
@@ -56,7 +56,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
       transports: ["websocket"],
       secure: true
     });
-    const peers = this.addMyselfToLinkedList(socket, this.peerId);
+    const peers = this.addMyselfToLinkedList(socket);
     const from = { name: this.name, peerId: this.peerId };
     peers.forEach(peer => {
       peer.on("signal", data => socket.emit(this.channelName, { data, from }));
@@ -69,24 +69,28 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
 
     return socket;
   }
+
   private setContactInfos(name: string) {
     const peerId = sha256(name + new Date().getTime());
     this.peerId = peerId;
     this.name = name;
   }
 
-  private createTimeout(socket: SocketIOClient.Socket) {
+  private closeSocketAfter(
+    socket: SocketIOClient.Socket,
+    connectionTimeOut: number
+  ) {
     return setTimeout(() => {
       console.error("connection timeout.");
       this.networkState.emit(ChannelState.Error);
       socket.close();
-    }, this.connectionTimeOut);
+    }, connectionTimeOut);
   }
 
   public bootstrap(address: string, name: string) {
     this.setContactInfos(name);
     const socket = this.signalingPeersOverSocket(address);
-    const timeout = this.createTimeout(socket);
+    const timeout = this.closeSocketAfter(socket, this.connectionTimeOut);
     this.rootChannel.once(() => {
       clearTimeout(timeout);
       this.networkState.emit(ChannelState.Ready);
