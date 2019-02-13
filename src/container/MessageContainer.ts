@@ -1,15 +1,22 @@
 import { Container } from "unstated";
 import IOverlayNetwork from "./models/IOverlayNetwork";
-import IMessage from "./models/IMessage";
 import IChannel, { ChannelType } from "./models/IChannel";
 import { sha256 } from "js-sha256";
+
+type Message = {
+  from?: string;
+  to?: string;
+  id: string;
+  message: string;
+  timeStamp: number;
+};
 
 type State = {
   message: string;
   channels: {
     [id: string]: IChannel;
   };
-  messages: Array<IMessage>;
+  messages: Array<Message>;
   autoFocus: boolean;
 };
 
@@ -17,7 +24,7 @@ export default class MessageContainer extends Container<State> {
   state = {
     message: "",
     channels: {},
-    messages: new Array<IMessage>(),
+    messages: new Array<Message>(),
     autoFocus: false
   };
 
