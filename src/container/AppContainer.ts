@@ -15,12 +15,8 @@ export default class AppContainer extends Container<AppState> {
     state: ChannelState.NotConnected
   };
 
-  constructor(private readonly overlayNetwork: IOverlayNetwork) {
+  constructor(overlayNetwork: IOverlayNetwork) {
     super();
     overlayNetwork.networkState.on(state => this.setState({ state }));
-  }
-
-  bootstrap(address: string, name: string) {
-    this.overlayNetwork.bootstrap(address, name);
   }
 }

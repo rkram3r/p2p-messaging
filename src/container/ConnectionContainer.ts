@@ -1,4 +1,5 @@
 import { Container } from "unstated";
+import IOverlayNetwork from "./models/IOverlayNetwork";
 
 type State = {
   address: string;
@@ -6,13 +7,13 @@ type State = {
   connection: string;
 };
 
-export class ConnectionContainer extends Container<State> {
+export default class ConnectionContainer extends Container<State> {
   state = {
     address: "",
     myName: "",
     connection: ""
   };
-  constructor() {
+  constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
     const myName = names[Math.floor(Math.random() * names.length)];
     const address = "localhost:3030";
@@ -22,6 +23,10 @@ export class ConnectionContainer extends Container<State> {
   connectionChange(connection: string) {
     const [myName, address] = connection.split("@");
     this.setState({ address, myName, connection });
+  }
+
+  bootstrap() {
+    this.overlayNetwork.bootstrap(this.state.address, this.state.myName);
   }
 }
 
