@@ -5,9 +5,13 @@ import ConnectionContainer from "../container/ConnectionContainer";
 export default () => (
   <Subscribe to={[ConnectionContainer]}>
     {(container: ConnectionContainer) => (
-      <div className="form-group row shadow-sm py-3">
+      <form
+        className="form-group row shadow-sm py-3"
+        onSubmit={event => event.preventDefault()}
+      >
         <div className="col-sm-8 col-lg-10">
           <input
+            autoFocus={container.state.autoFocus}
             className="form-control"
             onChange={({ target: { value } }) =>
               container.connectionChange(value)
@@ -18,7 +22,6 @@ export default () => (
         </div>
         <div className="col-sm-4 col-lg-2">
           <button
-            autoFocus={container.state.autoFocus}
             type="submit"
             className="float-right btn btn-block btn-primary"
             onClick={() => container.bootstrap()}
@@ -26,7 +29,7 @@ export default () => (
             Connect
           </button>
         </div>
-      </div>
+      </form>
     )}
   </Subscribe>
 );
