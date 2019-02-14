@@ -19,12 +19,12 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   ) {}
 
   private isInitiator(type: SignalingType) {
-    return type === SignalingType.Answer;
+    return type === SignalingType.Offer;
   }
 
   private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
-    const initiator = new Peer({ initiator: true });
-    const listener = new Peer();
+    const listener = new Peer({ initiator: true });
+    const initiator = new Peer();
     socket.on(this.channelName, ({ data, from }) => {
       const peer = this.isInitiator(data.type) ? initiator : listener;
       peer.signal(data);
@@ -33,6 +33,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
           socket.close();
           throw new Error("cannot bootstrap twice!");
         }
+
         if (data.type) {
           this.rootChannel.emit(
             new Contact(
