@@ -1,6 +1,8 @@
 {
   "name": "p2p-messaging",
   "version": "1.0.0",
+  "license": "MIT",
+  "repository": "https://github.com/rkram3r/p2p-messaging",
   "description": "fully-distributed, P2P messaging application.",
   "scripts": {
     "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
