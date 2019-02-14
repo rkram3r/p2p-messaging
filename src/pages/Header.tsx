@@ -13,7 +13,14 @@ export default () => (
     {(container: ConnectionContainer) => (
       <nav className="navbar navbar navbar-dark bg-dark justify-content-between">
         <div className="navbar-brand col-md-auto no-gutters">P2P-Messaging</div>
-        {container.state.state === ChannelState.NotConnected && (
+        {container.state.state === ChannelState.Ready ? (
+          <div className="col-md-auto no-gutters">
+            <div className="navbar-brand">
+              <span className="pr-2">{container.state.name}</span>
+              <FontAwesomeIcon icon={faCheckCircle} className="text-success" />
+            </div>
+          </div>
+        ) : (
           <form
             className="form-inline col-md-9 no-gutters"
             onSubmit={event => event.preventDefault()}
@@ -35,14 +42,6 @@ export default () => (
               <FontAwesomeIcon icon={faAngleDoubleRight} />
             </button>
           </form>
-        )}
-        {container.state.state === ChannelState.Ready && (
-          <div className="col-md-auto no-gutters">
-            <div className="navbar-brand">
-              <span className="pr-2">{container.state.name}</span>
-              <FontAwesomeIcon icon={faCheckCircle} className="text-success" />
-            </div>
-          </div>
         )}
       </nav>
     )}
