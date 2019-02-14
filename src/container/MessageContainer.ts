@@ -30,7 +30,7 @@ export default class MessageContainer extends Container<State> {
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
-    this.overlayNetwork.rootChannel.on(async contact => {
+    this.overlayNetwork.contacts.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Messages);
       this.state.channels[contact.peerId] = channel;
       this.setState({ channels: this.state.channels });

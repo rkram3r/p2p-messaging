@@ -21,7 +21,7 @@ export default class ContactlistContainer extends Container<Contacts> {
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
 
-    this.overlayNetwork.rootChannel.on(async contact => {
+    this.overlayNetwork.contacts.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
       this.state[contact.peerId] = {
         ...channel,

@@ -10,7 +10,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   public peerId: string;
   public name: string;
   public readonly networkState = new TypedEvent<ChannelState>();
-  public readonly rootChannel = new TypedEvent<IContact>();
+  public readonly contacts = new TypedEvent<IContact>();
   private readonly channelName: string = "p2p-connect";
 
   constructor(
@@ -35,7 +35,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
         }
 
         if (data.type) {
-          this.rootChannel.emit(
+          this.contacts.emit(
             new Contact(
               from.name,
               from.peerId,
@@ -91,7 +91,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     this.setContactInfos(name);
     const socket = this.signalingPeersOverSocket(address);
     const timeout = this.closeSocketAfter(socket, this.connectionTimeOut);
-    this.rootChannel.once(() => {
+    this.contacts.once(() => {
       clearTimeout(timeout);
       this.networkState.emit(ChannelState.Ready);
     });
