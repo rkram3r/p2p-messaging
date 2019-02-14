@@ -10,18 +10,16 @@ import Messages from "./Messages";
 export default () => {
   return (
     <Subscribe to={[ContactlistContainer]}>
-      {(container: ContactlistContainer) => (
-        <section>
-          <Header />
-          <main role="main" className="container-fluid">
-            <div className="row">
-              {container.any && <Contactlist />}
-              <Messages />
-            </div>
-            {container.any && <CreateMessage />}
-          </main>
-        </section>
-      )}
+      {(container: ContactlistContainer) => [
+        <Header key="header" />,
+        <main key="main" role="main" className="container-fluid">
+          <div className="row">
+            {container.any && <Contactlist />}
+            <Messages />
+          </div>
+          {container.any && <CreateMessage />}
+        </main>
+      ]}
     </Subscribe>
   );
 };

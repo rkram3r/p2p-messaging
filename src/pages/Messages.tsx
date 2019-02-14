@@ -3,10 +3,9 @@ import { Subscribe } from "unstated";
 
 import "./Messages.scss";
 import MessageContainer from "../container/MessageContainer";
-import AppContainer from "../container/AppContainer";
 
 export default () => (
-  <Subscribe to={[MessageContainer, AppContainer]}>
+  <Subscribe to={[MessageContainer]}>
     {(messageContainer: MessageContainer) => (
       <div className="col-sm-7 col-md-7 col-lg-7">
         {messageContainer.state.messages
