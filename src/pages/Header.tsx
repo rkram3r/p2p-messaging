@@ -1,31 +1,49 @@
 import * as React from "react";
 import { Subscribe } from "unstated";
-import AppContainer from "../container/AppContainer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
-  faTimesCircle
+  faAngleDoubleRight
 } from "@fortawesome/free-solid-svg-icons";
 import { ChannelState } from "../container/models/IChannel";
+import ConnectionContainer from "../container/ConnectionContainer";
 
 export default () => (
-  <Subscribe to={[AppContainer]}>
-    {({ state: { name, peerId, state } }: AppContainer) => (
-      <nav className="navbar navbar-dark bg-dark">
-        <span className="navbar-brand">
-          <span className="mb-0">P2P-Messaging</span>
-        </span>
-        <span className="navbar-brand text-right">
-          <span>
-            {state === ChannelState.Error && (
-              <FontAwesomeIcon icon={faTimesCircle} className="text-danger" />
-            )}
-            {state === ChannelState.Ready && (
+  <Subscribe to={[ConnectionContainer]}>
+    {(container: ConnectionContainer) => (
+      <nav className="navbar navbar navbar-dark bg-dark justify-content-between">
+        <div className="navbar-brand col-md-auto no-gutters">P2P-Messaging</div>
+        {container.state.state === ChannelState.NotConnected && (
+          <form
+            className="form-inline col-md-9 no-gutters"
+            onSubmit={event => event.preventDefault()}
+          >
+            <input
+              autoFocus={container.state.autoFocus}
+              className="form-control col no-gutters"
+              onChange={({ target: { value } }) =>
+                container.connectionChange(value)
+              }
+              placeholder="name@Address:Port"
+              value={container.state.connection}
+            />
+            <button
+              type="submit"
+              className="btn btn-outline-success col-md-1 col-2"
+              onClick={() => container.bootstrap()}
+            >
+              <FontAwesomeIcon icon={faAngleDoubleRight} />
+            </button>
+          </form>
+        )}
+        {container.state.state === ChannelState.Ready && (
+          <div className="col-md-auto no-gutters">
+            <div className="navbar-brand">
+              <span className="pr-2">{container.state.name}</span>
               <FontAwesomeIcon icon={faCheckCircle} className="text-success" />
-            )}{" "}
-            {peerId}
-          </span>
-        </span>
+            </div>
+          </div>
+        )}
       </nav>
     )}
   </Subscribe>
