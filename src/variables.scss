@@ -1,8 +1,9 @@
 $enable-shadows: true;
 $enable-rounded: false;
-$enable-gradients: true;
-  
-$theme-colors: ("primary":   #0065a3);
+$enable-gradients: false;
+
+$theme-colors: (
+  "primary": #343a40
+);
 
 @import "~bootstrap/scss/bootstrap";
-  

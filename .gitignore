@@ -2,6 +2,7 @@
 .vscode
 dist
 .env
+
 # Logs
 logs
 *.log

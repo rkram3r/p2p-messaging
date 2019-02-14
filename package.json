@@ -1,91 +1,35 @@
 {
   "name": "p2p-messaging",
   "version": "1.0.0",
-  "description": "fully-distributed, P2P messaging application with an integrated, blockchain-based notary service.",
-  "private": false,
+  "description": "fully-distributed, P2P messaging application.",
   "scripts": {
-    "start": "concurrently \"npm run watch:server\" \"npm run watch:client\"",
-    "watch:server": "cross-env PORT=3030 nodemon ./server.js --watch server.js",
-    "start:server": "node ./server.js --ssl --cors",
-    "watch:client": "parcel ./src/index.html --open"
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:server": "node ./server.js",
+    "start:client": "parcel ./src/index.html --open"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "bootstrap": "^4.1.3",
-    "core-js": "^2.5.7",
-    "crypto-js": "^3.1.9-1",
-    "history": "^4.7.2",
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.4",
-    "react": "^16.6.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
+    "@fortawesome/free-solid-svg-icons": "^5.7.2",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "bootstrap": "^4.2.1",
+    "js-sha256": "^0.9.0",
+    "react": "^16.7.0",
     "react-dom": "^16.6.0",
-    "react-feather": "^1.1.4",
-    "react-redux": "^5.1.0",
-    "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "react-router-redux": "^4.0.8",
-    "redux": "^4.0.1",
-    "redux-thunk": "^2.3.0",
     "simple-peer": "^9.1.2",
     "socket.io": "^2.1.1",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.1.1",
+    "unstated": "^2.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.2",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/preset-react": "^7.0.0",
+    "@types/react-dom": "^16.0.11",
+    "@types/react-router-dom": "^4.3.1",
+    "@types/simple-peer": "^6.1.5",
+    "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
     "concurrently": "^4.0.1",
-    "cross-env": "^5.2.0",
-    "eslint": "^5.6.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.2",
-    "eslint-plugin-react": "^7.11.1",
-    "node-sass": "^4.9.4",
-    "nodemon": "^1.18.5",
-    "parcel": "^1.10.3"
-  },
-  "eslintConfig": {
-    "extends": "airbnb",
-    "globals": {
-      "window": true,
-      "document": true,
-      "Web3": true
-    },
-    "rules": {
-      "react/jsx-filename-extension": [
-        1,
-        {
-          "extensions": [
-            ".js",
-            ".jsx"
-          ]
-        }
-      ],
-      "react/prop-types": [
-        false
-      ],
-      "no-unused-expressions": [
-        2,
-        {
-          "allowShortCircuit": true
-        }
-      ],
-      "jsx-a11y/label-has-for": [
-        2,
-        {
-          "components": [
-            "Label"
-          ],
-          "required": {
-            "every": [
-              "id"
-            ]
-          },
-          "allowChildren": false
-        }
-      ]
-    }
+    "parcel": "^1.10.3",
+    "sass": "^1.16.1",
+    "typescript": "^3.3.1"
   }
 }
