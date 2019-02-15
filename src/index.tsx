@@ -9,10 +9,10 @@ import MessageContainer from "./container/MessageContainer";
 import ContactlistContainer from "./container/ContactlistContainer";
 import ConnectionContainer from "./container/ConnectionContainer";
 
-const linkexListOverlayNetwork = new LinkedListOverlayNetwork(io, 3000);
-const messageContainer = new MessageContainer(linkexListOverlayNetwork);
-const contactlistContainer = new ContactlistContainer(linkexListOverlayNetwork);
-const connectionContainer = new ConnectionContainer(linkexListOverlayNetwork);
+const linkedListOverlayNetwork = new LinkedListOverlayNetwork(io, 10000);
+const messageContainer = new MessageContainer(linkedListOverlayNetwork);
+const contactlistContainer = new ContactlistContainer(linkedListOverlayNetwork);
+const connectionContainer = new ConnectionContainer(linkedListOverlayNetwork);
 
 ReactDOM.render(
   <Provider
