@@ -10,10 +10,12 @@ export default () => (
       <div className="col-sm-7 col-md-7 col-lg-7">
         {messageContainer.state.messages
           .sort((a, b) => a.timeStamp - b.timeStamp)
-          .map(({ from, id, message }) => (
+          .map(({ from, timeStamp, message }) => (
             <div
-              key={id}
-              className={`my-2 speech-bubble-${from ? "me" : "other"}`}
+              key={timeStamp}
+              className={`my-2 speech-bubble-${
+                from === undefined ? "me" : "other"
+              }`}
             >
               {message}
             </div>

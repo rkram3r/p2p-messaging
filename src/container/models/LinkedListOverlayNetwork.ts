@@ -3,11 +3,10 @@ import { SignalingType } from "./ISignalingData";
 import IOverlayNetwork from "./IOverlayNetwork";
 import Contact from "./Contact";
 import TypedEvent from "./TypedEvent";
-import { sha256 } from "js-sha256";
-import { ChannelState, IContact } from "./IChannel";
+import { ChannelState, IContact, ChannelType } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
-  public peerId: string;
+  public peerId: number = 0;
   public name: string;
   public readonly networkState = new TypedEvent<ChannelState>();
   public readonly contacts = new TypedEvent<IContact>();
@@ -22,27 +21,40 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     return type === SignalingType.Offer;
   }
 
+  private async createContact(
+    type: SignalingType,
+    name: string,
+    peer: Peer.Instance
+  ) {
+    return new Promise<IContact>(async resolve => {
+      const contact = new Contact(name, peer, this.isInitiator(type));
+      const channel = await contact.createNewChannel(ChannelType.PeerId);
+      channel.peer.on("data", data => {
+        contact.peerId = JSON.parse(data);
+        channel.peer.end();
+        resolve(contact);
+      });
+      if (this.isInitiator(type)) {
+        contact.peerId = this.peerId + 1;
+        channel.peer.send(JSON.stringify(this.peerId));
+        resolve(contact);
+      }
+    });
+  }
+
   private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
     const listener = new Peer({ initiator: true });
     const initiator = new Peer();
-    socket.on(this.channelName, ({ data, from }) => {
+    socket.on(this.channelName, ({ data, name }) => {
       const peer = this.isInitiator(data.type) ? initiator : listener;
       peer.signal(data);
-      peer.on("connect", () => {
-        if (this.peerId === from.peerId) {
-          socket.close();
-          throw new Error("cannot bootstrap twice!");
-        }
-
+      peer.on("connect", async () => {
         if (data.type) {
-          this.contacts.emit(
-            new Contact(
-              from.name,
-              from.peerId,
-              peer,
-              this.isInitiator(data.type)
-            )
-          );
+          const contact = await this.createContact(data.type, name, peer);
+          if (!this.isInitiator(data.type)) {
+            this.peerId = contact.peerId + 1;
+          }
+          this.contacts.emit(contact);
           data.type === SignalingType.Offer && socket.close();
         }
       });
@@ -57,9 +69,10 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
       secure: true
     });
     const peers = this.addMyselfToLinkedList(socket);
-    const from = { name: this.name, peerId: this.peerId };
     peers.forEach(peer => {
-      peer.on("signal", data => socket.emit(this.channelName, { data, from }));
+      peer.on("signal", data =>
+        socket.emit(this.channelName, { data, name: this.name })
+      );
       peer.on("error", error => {
         socket.close();
         console.error(error);
@@ -68,12 +81,6 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     });
 
     return socket;
-  }
-
-  private setContactInfos(name: string) {
-    const peerId = sha256(name + new Date().getTime());
-    this.peerId = peerId;
-    this.name = name;
   }
 
   private closeSocketAfter(
@@ -88,12 +95,12 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   }
 
   public bootstrap(address: string, name: string) {
-    this.setContactInfos(name);
+    this.name = name;
     const socket = this.signalingPeersOverSocket(address);
     const timeout = this.closeSocketAfter(socket, this.connectionTimeOut);
     this.contacts.once(() => {
-      clearTimeout(timeout);
       this.networkState.emit(ChannelState.Ready);
+      clearTimeout(timeout);
     });
   }
 }

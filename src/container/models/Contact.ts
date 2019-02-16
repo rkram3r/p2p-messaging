@@ -10,10 +10,9 @@ type SignalExchange = {
 
 export default class Contact implements IContact {
   private readonly channelEvent = new TypedEvent<SignalExchange>();
-
+  public peerId: number;
   constructor(
     public readonly name: string,
-    public readonly peerId: string,
     public readonly peer: Peer.Instance,
     private readonly isInitiator: boolean
   ) {
