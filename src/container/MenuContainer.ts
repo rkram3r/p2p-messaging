@@ -27,9 +27,7 @@ export default class MenuContainer extends Container<State> {
     const connection = `${name}@${address}`;
     this.setState({ connection, name, address });
 
-    overlayNetwork.networkState.once(() => {
-      this.setState({ autoFocus: false });
-    });
+    overlayNetwork.networkState.once(() => this.setState({ autoFocus: false }));
     overlayNetwork.networkState.on(state => {
       if (state === ChannelState.Ready) {
         this.setState({

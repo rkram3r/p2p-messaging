@@ -13,10 +13,14 @@ export default () => {
       {(container: ContactlistContainer) => [
         <Menu key="header" />,
         container.any && (
-          <main key="main" className="container-fluid">
+          <main key="main" className="container-fluid py-3">
             <div className="row">
-              <Contactlist />
-              <Messages />
+              <div className="col-sm-3">
+                <Contactlist />
+              </div>
+              <div className="col-sm-9 container-fluid">
+                <Messages />
+              </div>
             </div>
             <CreateMessage />
           </main>

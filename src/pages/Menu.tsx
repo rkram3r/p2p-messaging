@@ -37,7 +37,7 @@ export default () => (
             />
             <button
               type="submit"
-              className="btn btn-outline-success col-md-1 col-2"
+              className="btn btn-outline-success"
               onClick={() => container.bootstrap()}
             >
               <FontAwesomeIcon icon={faAngleDoubleRight} />

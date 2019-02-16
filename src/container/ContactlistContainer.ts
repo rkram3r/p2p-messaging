@@ -19,6 +19,13 @@ export default class ContactlistContainer extends Container<Contacts> {
 
   constructor(private readonly overlayNetwork: IOverlayNetwork) {
     super();
+    this.overlayNetwork.networkState.once(state => {
+      this.state[this.overlayNetwork.peerId] = {
+        peerId: this.overlayNetwork.peerId,
+        name: this.overlayNetwork.name,
+        state
+      };
+    });
     this.overlayNetwork.contacts.on(async contact => {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
       this.state[contact.peerId] = {
@@ -60,7 +67,9 @@ export default class ContactlistContainer extends Container<Contacts> {
     }));
 
     this.contacts
-      .filter(({ peer }) => peer)
+      .filter(
+        ({ peer, peerId }) => peer && peerId !== this.overlayNetwork.peerId
+      )
       .forEach(({ peer }) => peer.send(JSON.stringify(peers)));
   }
 
