@@ -6,11 +6,11 @@ import {
   faAngleDoubleRight
 } from "@fortawesome/free-solid-svg-icons";
 import { ChannelState } from "../container/models/IChannel";
-import ConnectionContainer from "../container/ConnectionContainer";
+import MenuContainer from "../container/MenuContainer";
 
 export default () => (
-  <Subscribe to={[ConnectionContainer]}>
-    {(container: ConnectionContainer) => (
+  <Subscribe to={[MenuContainer]}>
+    {(container: MenuContainer) => (
       <nav className="navbar navbar navbar-dark bg-dark justify-content-between">
         <div className="navbar-brand col-md-auto no-gutters">P2P-Messaging</div>
         {container.state.state === ChannelState.Ready ? (

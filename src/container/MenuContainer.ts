@@ -11,7 +11,7 @@ type State = {
   state: ChannelState;
 };
 
-export default class ConnectionContainer extends Container<State> {
+export default class MenuContainer extends Container<State> {
   state = {
     address: "",
     name: "",

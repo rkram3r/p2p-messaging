@@ -14,9 +14,8 @@
     "@fortawesome/free-solid-svg-icons": "^5.7.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "bootstrap": "^4.2.1",
-    "react": "^16.7.0",
+    "react": "^16.8.2",
     "react-dom": "^16.6.0",
-    "react-router-dom": "^4.3.1",
     "simple-peer": "^9.1.2",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
@@ -24,7 +23,6 @@
   },
   "devDependencies": {
     "@types/react-dom": "^16.0.11",
-    "@types/react-router-dom": "^4.3.1",
     "@types/simple-peer": "^6.1.5",
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
