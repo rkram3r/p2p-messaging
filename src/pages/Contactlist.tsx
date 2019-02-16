@@ -27,17 +27,19 @@ export default () => (
   <Subscribe to={[ContactlistContainer]}>
     {({ contacts }: ContactlistContainer) => (
       <div className="py-2 col-sm-5 col-md-5 col-lg-5">
-        {contacts.map(({ name, state, peerId }) => (
-          <button
-            key={peerId}
-            onClick={() => state.goToNextState()}
-            type="button"
-            className="list-group-item-action list-group-item"
-          >
-            <span className="px-1">{stateMap.get(state)}</span>
-            {name}
-          </button>
-        ))}
+        {contacts
+          .sort((a, b) => a.peerId - b.peerId)
+          .map(({ name, state, peerId }) => (
+            <button
+              key={peerId}
+              onClick={() => state.goToNextState()}
+              type="button"
+              className="list-group-item-action list-group-item"
+            >
+              <span className="px-1">{stateMap.get(state)}</span>
+              {name}@{peerId}
+            </button>
+          ))}
       </div>
     )}
   </Subscribe>

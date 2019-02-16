@@ -6,7 +6,6 @@ import IOverlayNetwork from "./models/IOverlayNetwork";
 type ContactInformation = {
   peerId: number;
   name: string;
-  from: number;
   state?: ChannelState;
   peer?: Peer.Instance;
 };
@@ -25,7 +24,6 @@ export default class ContactlistContainer extends Container<Contacts> {
       const channel = await contact.createNewChannel(ChannelType.Contactlist);
       this.state[contact.peerId] = {
         ...channel,
-        from: this.overlayNetwork.peerId,
         state: ChannelState.Ready
       };
       await this.setState(this.state);
@@ -59,15 +57,12 @@ export default class ContactlistContainer extends Container<Contacts> {
   private sendContactinformations() {
     const peers = this.contacts.map(({ name, peerId }) => ({
       peerId,
-      name,
-      from: this.overlayNetwork.peerId
+      name
     }));
 
     this.contacts
       .filter(({ peer }) => peer)
-      .forEach(({ peer, peerId }) =>
-        peer.send(JSON.stringify(peers.filter(({ from }) => from !== peerId)))
-      );
+      .forEach(({ peer }) => peer.send(JSON.stringify(peers)));
   }
 
   get contacts() {
