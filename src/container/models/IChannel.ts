@@ -20,6 +20,6 @@ export interface IContact extends IChannel {
 
 export default interface IChannel {
   peer?: Peer.Instance;
-  peerId: string;
+  peerId: number;
   name: string;
 }
