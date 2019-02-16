@@ -1,12 +1,10 @@
 import { Container } from "unstated";
 import IOverlayNetwork from "./models/IOverlayNetwork";
 import IChannel, { ChannelType } from "./models/IChannel";
-import { sha256 } from "js-sha256";
 
 type Message = {
-  from?: string;
+  from?: number;
   to?: string;
-  id: string;
   message: string;
   timeStamp: number;
 };
@@ -51,8 +49,7 @@ export default class MessageContainer extends Container<State> {
   send() {
     if (this.state.message.length !== 0) {
       const timeStamp = new Date().getTime();
-      const id = sha256(this.state.message + `${timeStamp}`);
-      const newMessage = { id, message: this.state.message, timeStamp };
+      const newMessage = { message: this.state.message, timeStamp };
       Object.keys(this.state.channels).forEach(to => {
         const { peer } = this.state.channels[to];
         peer.send(JSON.stringify({ ...newMessage, to }));

@@ -17,6 +17,7 @@ export default () => (
           <div className="col-md-auto no-gutters">
             <div className="navbar-brand">
               <span className="pr-2">{container.state.name}</span>
+              <span className="pr-2">{container.state.peerId}</span>
               <FontAwesomeIcon icon={faCheckCircle} className="text-success" />
             </div>
           </div>

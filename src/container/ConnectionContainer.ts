@@ -6,7 +6,7 @@ type State = {
   address: string;
   connection: string;
   autoFocus: boolean;
-  peerId?: number;
+  peerId: number;
   name: string;
   state: ChannelState;
 };
@@ -15,6 +15,7 @@ export default class ConnectionContainer extends Container<State> {
   state = {
     address: "",
     name: "",
+    peerId: NaN,
     state: ChannelState.NotConnected,
     connection: "",
     autoFocus: true

@@ -11,8 +11,6 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
   public readonly networkState = new TypedEvent<ChannelState>();
   public readonly contacts = new TypedEvent<IContact>();
   private readonly channelName: string = "p2p-connect";
-  private leftNode: IContact;
-  private rightNode: IContact;
 
   constructor(
     private readonly io: SocketIOClientStatic,
@@ -23,6 +21,27 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     return type === SignalingType.Offer;
   }
 
+  private async createContact(
+    type: SignalingType,
+    name: string,
+    peer: Peer.Instance
+  ) {
+    return new Promise<IContact>(async resolve => {
+      const contact = new Contact(name, peer, this.isInitiator(type));
+      const channel = await contact.createNewChannel(ChannelType.PeerId);
+      channel.peer.on("data", data => {
+        contact.peerId = JSON.parse(data);
+        channel.peer.end();
+        resolve(contact);
+      });
+      if (this.isInitiator(type)) {
+        contact.peerId = this.peerId + 1;
+        channel.peer.send(JSON.stringify(this.peerId));
+        resolve(contact);
+      }
+    });
+  }
+
   private addMyselfToLinkedList(socket: SocketIOClient.Socket) {
     const listener = new Peer({ initiator: true });
     const initiator = new Peer();
@@ -31,38 +50,11 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
       peer.signal(data);
       peer.on("connect", async () => {
         if (data.type) {
-          const contact = new Contact(name, peer, this.isInitiator(data.type));
-          const channel = await contact.createNewChannel(
-            ChannelType.RootChannel
-          );
-          if (this.isInitiator(data.type)) {
-            this.rightNode = contact;
-            this.rightNode.peerId = this.peerId + 1;
-            channel.peer.send(JSON.stringify(this.peerId));
-            this.contacts.emit(this.rightNode);
-          } else {
-            this.leftNode = contact;
-
-            channel.peer.on("data", data => {
-              const x = JSON.parse(data);
-              this.peerId = x + 1;
-              console.log("leftnode", x);
-              this.leftNode.peerId = x;
-              this.contacts.emit(this.leftNode);
-
-              console.log(
-                `left: ${this.leftNode && this.leftNode.peerId} me: ${
-                  this.peerId
-                } right:${this.rightNode && this.rightNode.peerId}`
-              );
-            });
+          const contact = await this.createContact(data.type, name, peer);
+          if (!this.isInitiator(data.type)) {
+            this.peerId = contact.peerId + 1;
           }
-
-          console.log(
-            `left: ${this.leftNode && this.leftNode.peerId} me: ${
-              this.peerId
-            } right:${this.rightNode && this.rightNode.peerId}`
-          );
+          this.contacts.emit(contact);
           data.type === SignalingType.Offer && socket.close();
         }
       });
@@ -107,8 +99,8 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
     const socket = this.signalingPeersOverSocket(address);
     const timeout = this.closeSocketAfter(socket, this.connectionTimeOut);
     this.contacts.once(() => {
-      clearTimeout(timeout);
       this.networkState.emit(ChannelState.Ready);
+      clearTimeout(timeout);
     });
   }
 }
