@@ -7,7 +7,7 @@ import { sha256 } from "js-sha256";
 import { ChannelState, IContact } from "./IChannel";
 
 export default class LinkedListOverlayNetwork implements IOverlayNetwork {
-  public peerId: string;
+  public peerId: number;
   public name: string;
   public readonly networkState = new TypedEvent<ChannelState>();
   public readonly contacts = new TypedEvent<IContact>();
@@ -72,7 +72,7 @@ export default class LinkedListOverlayNetwork implements IOverlayNetwork {
 
   private setContactInfos(name: string) {
     const peerId = sha256(name + new Date().getTime());
-    this.peerId = peerId;
+    this.peerId = Number.parseInt(peerId, 16);
     this.name = name;
   }
 

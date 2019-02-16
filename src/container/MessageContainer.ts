@@ -14,7 +14,7 @@ type Message = {
 type State = {
   message: string;
   channels: {
-    [id: string]: IChannel;
+    [peerId: number]: IChannel;
   };
   messages: Array<Message>;
   autoFocus: boolean;

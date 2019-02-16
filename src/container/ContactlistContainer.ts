@@ -4,7 +4,7 @@ import IChannel, { ChannelType, ChannelState } from "./models/IChannel";
 import IOverlayNetwork from "./models/IOverlayNetwork";
 
 type ContactInformation = {
-  peerId: string;
+  peerId: number;
   name: string;
   from: string;
   state?: ChannelState;
@@ -12,7 +12,7 @@ type ContactInformation = {
 };
 
 type Contacts = {
-  [peerId: string]: ContactInformation;
+  [peerId: number]: ContactInformation;
 };
 
 export default class ContactlistContainer extends Container<Contacts> {
