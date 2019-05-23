@@ -5,9 +5,7 @@
   "repository": "https://github.com/rkram3r/p2p-messaging",
   "description": "fully-distributed, P2P messaging application.",
   "scripts": {
-    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
-    "start:server": "node ./server.js",
-    "start:client": "parcel ./src/index.html --open"
+    "start": "concurrently \"node ./server.js\" \"parcel ./src/index.html --open\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.17",
